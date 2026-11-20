@@ -10,7 +10,7 @@
 
 菜单里版本号下面的“检查更新…”会查询 GitHub 公开仓库 [33to9/KeenQuad](https://github.com/33to9/KeenQuad) 的最新正式版。有新版本时显示版本号和更新说明，点“前往下载”打开 Release 页面，下载 zip 后替换 `/Applications/KeenQuad.app` 即可。只在点击时联网一次，请求里不带任何用户信息，不自动下载或安装。仓库地址写在 `Info.plist` 的 `KQUpdateRepository`。
 
-发布新版本：改 `Info.plist` 的版本号，构建、打包，在仓库建 `v<版本>` 标签的 Release 并附上 `KeenQuad-<版本>.zip`。
+发布新版本：改 `Info.plist` 的版本号，运行 `./build.sh --install --package`，提交并推送，然后 `gh release create v<版本> ../dist/KeenQuad_v<版本>_macOS.zip`。用户也可以用仓库根目录的 `install.sh` 一行命令安装或更新。
 
 ## 和“系统设置 › 显示器”的区别
 

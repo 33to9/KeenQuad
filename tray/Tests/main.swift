@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright © 2026 33to9
 // 只读自测：用 7.1 的模式表校验 F3/F4 规则，再读取本机真实模式表打印菜单。不切换任何模式。
 // 运行：./Tests/run-selftest.sh
 import AppKit

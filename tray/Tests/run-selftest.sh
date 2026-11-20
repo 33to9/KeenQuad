@@ -1,4 +1,6 @@
 #!/bin/sh
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright © 2026 33to9
 set -eu
 SRC="$(cd "$(dirname "$0")/.." && pwd)"
 BIN="${TMPDIR:-/tmp}/keenquad-selftest"

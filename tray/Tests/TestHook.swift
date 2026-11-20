@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright © 2026 33to9
 #if KEENQUAD_TEST
 // 仅测试构建（KEENQUAD_TEST=1 ./build.sh）包含此文件，产品包里没有。
 // 通过分布式通知驱动真实的 NSMenu 项和面板按键，把状态写到 $TMPDIR/keenquad-test.txt。

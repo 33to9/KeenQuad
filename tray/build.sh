@@ -1,7 +1,11 @@
 #!/bin/sh
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright © 2026 33to9
 # 一条命令构建 KeenQuad.app（6.4）。构建与签名都在内置盘上完成。
 # 用法：./build.sh            构建到 ~/Library/Caches/KeenQuad-build/KeenQuad.app
-#       ./build.sh --install  构建后复制到 /Applications/KeenQuad.app
+#       ./build.sh --install  构建后原地更新 /Applications/KeenQuad.app
+#       ./build.sh --package  构建后打包为 ../dist/KeenQuad_v<版本>_macOS.zip（发布到 GitHub Releases 用）
+#       两个选项可以同时使用
 set -eu
 
 SRC="$(cd "$(dirname "$0")" && pwd)"
@@ -43,7 +47,28 @@ codesign --force --sign - "$APP"
 codesign --verify --strict --verbose=2 "$APP"
 echo "已构建：$APP"
 
-if [ "${1:-}" = "--install" ]; then
+INSTALL=0; PACKAGE=0
+for arg in "$@"; do
+  case "$arg" in
+    --install) INSTALL=1 ;;
+    --package) PACKAGE=1 ;;
+    *) echo "未知选项：$arg" >&2; exit 1 ;;
+  esac
+done
+
+if [ "$PACKAGE" = "1" ]; then
+  if [ "${KEENQUAD_TEST:-}" = "1" ]; then echo "测试构建不得打包" >&2; exit 1; fi
+  VERSION=$(defaults read "$APP/Contents/Info.plist" CFBundleShortVersionString)
+  ZIP="$OUT/KeenQuad_v${VERSION}_macOS.zip"
+  rm -f "$ZIP"
+  ditto -c -k --keepParent "$APP" "$ZIP"
+  mkdir -p "$SRC/../dist"
+  cat "$ZIP" > "$SRC/../dist/KeenQuad_v${VERSION}_macOS.zip"
+  echo "已打包：$SRC/../dist/KeenQuad_v${VERSION}_macOS.zip"
+  shasum -a 256 "$ZIP"
+fi
+
+if [ "$INSTALL" = "1" ]; then
   if [ "${KEENQUAD_TEST:-}" = "1" ]; then echo "测试构建不得安装" >&2; exit 1; fi
   if pgrep -x KeenQuad >/dev/null; then osascript -e 'quit app id "com.keenquad.app"' || true; sleep 1; fi
   # 原地更新应用包内容，不删除整个 .app：删除后系统会清掉它的登录项记录

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright © 2026 33to9
 import AppKit
 
 /// 防黑屏确认面板（F6）。非模态小面板 + 加入 `.common` 模式的定时器，超时无人操作也能自动还原。

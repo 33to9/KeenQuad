@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright © 2026 33to9
 import AppKit
 
 // F9.2：已有相同 Bundle ID 的实例在运行时直接退出。

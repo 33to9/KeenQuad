@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright © 2026 33to9
 import Foundation
 
 /// 模式表中的一条记录（附录 B）。纯数据，不触碰任何系统接口，可单独测试。

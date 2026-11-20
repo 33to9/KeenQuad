@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright © 2026 33to9
 // 私有接口声明（N5：全部集中在此头文件与 PrivateDisplay.swift 中）。
 // 结构体大小必须为 212 字节，见需求文档 6.1 / 附录 A。
 #include <CoreGraphics/CoreGraphics.h>

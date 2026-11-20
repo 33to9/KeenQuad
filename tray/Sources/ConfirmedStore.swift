@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright © 2026 33to9
 import Foundation
 
 /// 已确认模式签名的持久化（F7.1 / 6.5）。只使用一个键 `confirmedModes`。

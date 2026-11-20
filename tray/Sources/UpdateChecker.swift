@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright © 2026 33to9
 import Foundation
 
 /// 检查更新的纯逻辑（F14 / v0.4 第 3 节），与网络和界面无关，便于自测。
