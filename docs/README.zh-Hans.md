@@ -105,7 +105,7 @@ cd KeenQuad/tray
 ./Tests/run-selftest.sh     # 只读规则自测，不会切换分辨率
 ```
 
-`./build.sh --package` 会生成用于发布的 `dist/KeenQuad_vX.Y.Z_macOS.zip`。开发说明见 [`tray/README.md`](../tray/README.md)，需求说明见 `KeenQuad_Tray_v0_*.md`。
+`./build.sh --package` 会生成用于发布的 `dist/KeenQuad_vX.Y.Z_macOS.zip`。开发说明见 [`tray/README.md`](../tray/README.md)。
 
 ## 许可证
 

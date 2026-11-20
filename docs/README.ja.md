@@ -105,7 +105,7 @@ cd KeenQuad/tray
 ./Tests/run-selftest.sh     # 読み取り専用のルールテスト。解像度は切り替えません
 ```
 
-`./build.sh --package` でリリース用の `dist/KeenQuad_vX.Y.Z_macOS.zip` を作成します。開発メモ（中国語）は [`tray/README.md`](../tray/README.md)、仕様書は `KeenQuad_Tray_v0_*.md` にあります。
+`./build.sh --package` でリリース用の `dist/KeenQuad_vX.Y.Z_macOS.zip` を作成します。開発メモ（中国語）は [`tray/README.md`](../tray/README.md)にあります。
 
 ## ライセンス
 

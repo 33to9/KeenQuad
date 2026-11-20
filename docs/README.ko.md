@@ -105,7 +105,7 @@ cd KeenQuad/tray
 ./Tests/run-selftest.sh     # 읽기 전용 규칙 테스트, 해상도를 바꾸지 않음
 ```
 
-`./build.sh --package`는 릴리스용 `dist/KeenQuad_vX.Y.Z_macOS.zip`을 만듭니다. 개발 노트(중국어)는 [`tray/README.md`](../tray/README.md)에, 사양서는 `KeenQuad_Tray_v0_*.md`에 있습니다.
+`./build.sh --package`는 릴리스용 `dist/KeenQuad_vX.Y.Z_macOS.zip`을 만듭니다. 개발 노트(중국어)는 [`tray/README.md`](../tray/README.md)에 있습니다.
 
 ## 라이선스
 
