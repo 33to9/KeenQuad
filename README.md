@@ -12,6 +12,8 @@
 > **KeenQuad** is a tiny menu-bar app that switches your display between HiDPI resolutions, including the sharp ones that System Settings doesn't show.
 > On many external displays, a resolution like 1600 × 1000 appears in System Settings only in its 1x version, which looks blurry. macOS also has a HiDPI version of it that looks crisp, but only apps that read the full display mode table can switch to it. KeenQuad does exactly that, and nothing more.
 
+<p align="center"><img src="img/keenquad-ui.png" alt="KeenQuad's menu and its Keep this resolution? panel" width="860"></p>
+
 ## Why the same resolution can look blurry or sharp
 
 Each size usually exists twice in macOS's display mode table. On a 2560 × 1600 panel, for 1600 × 1000:

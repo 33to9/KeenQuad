@@ -12,6 +12,8 @@
 > **KeenQuad** es una pequeña app de la barra de menús que cambia tu pantalla entre resoluciones HiDPI, incluidas las nítidas que Ajustes del Sistema no muestra.
 > En muchas pantallas externas, una resolución como 1600 × 1000 aparece en Ajustes del Sistema solo en su versión 1x, que se ve borrosa. macOS también tiene una versión HiDPI que se ve nítida, pero solo las apps que leen la lista completa de modos de pantalla pueden cambiar a ella. Eso es justo lo que hace KeenQuad, y nada más.
 
+<p align="center"><img src="../img/keenquad-ui.png" alt="El menú de KeenQuad y su panel de confirmación" width="860"></p>
+
 ## Por qué la misma resolución puede verse borrosa o nítida
 
 Cada tamaño suele aparecer dos veces en la lista de modos de pantalla de macOS. En un panel de 2560 × 1600, para 1600 × 1000:

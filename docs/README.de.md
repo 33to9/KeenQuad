@@ -12,6 +12,8 @@
 > **KeenQuad** ist eine kleine Menüleisten-App, die deinen Monitor zwischen HiDPI-Auflösungen umschaltet – auch zu den scharfen, die die Systemeinstellungen nicht anzeigen.
 > Bei vielen externen Monitoren gibt es eine Auflösung wie 1600 × 1000 in den Systemeinstellungen nur in der 1x-Version, und die wirkt unscharf. macOS hat auch eine HiDPI-Version davon, die gestochen scharf aussieht, aber umschalten können nur Apps, die die vollständige Liste der Anzeigemodi lesen. Genau das macht KeenQuad, und nicht mehr.
 
+<p align="center"><img src="../img/keenquad-ui.png" alt="Das Menü von KeenQuad und sein Bestätigungsfenster" width="860"></p>
+
 ## Warum dieselbe Auflösung unscharf oder scharf sein kann
 
 Jede Größe steht in der Liste der Anzeigemodi von macOS meist zweimal. Bei einem 2560 × 1600-Panel und 1600 × 1000:

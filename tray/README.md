@@ -50,6 +50,7 @@ KEENQUAD_TEST=1 ./build.sh       # ~/Library/Caches/KeenQuad-build-test/KeenQuad
 
 - It uses its own bundle ID, `com.pivotfrag.keenquad.test`, so it never touches the installed app's login item or settings. `build.sh` refuses to install or package it.
 - `Tests/TestHook.swift` listens for the distributed notification `com.pivotfrag.keenquad.testhook`, whose object is a command (`menu`, `click:<title>`, `return`, `esc`, `state`, `snap`, `remove`, `update[:<version>[:<repo>]]`, …). Results go to `$TMPDIR/keenquad-test.txt`.
+- `shotmenu` and `shotpanel:<WxH>:<WxH>` capture the real menu and confirmation panel (previous and new size) as PNGs in `$TMPDIR`, without switching anything. They capture only KeenQuad's own windows, so no Screen Recording permission is needed. The README screenshot `img/keenquad-ui.png` was made this way with the language set to English.
 - Switching resolution rearranges the windows on screen. Tell whoever is using the Mac before testing, prefer larger desktops, and switch back afterwards.
 - Delete the test build when you're done.
 

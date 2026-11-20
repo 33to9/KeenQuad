@@ -12,6 +12,8 @@
 > **KeenQuad** est une petite app de la barre des menus qui fait passer votre écran d’une définition HiDPI à une autre, y compris celles, bien nettes, que Réglages Système n’affiche pas.
 > Sur beaucoup d’écrans externes, une définition comme 1600 × 1000 n’apparaît dans Réglages Système qu’en version 1x, et elle paraît floue. macOS en possède aussi une version HiDPI, bien nette, mais seules les apps qui lisent la liste complète des modes d’affichage peuvent y passer. C’est exactement ce que fait KeenQuad, et rien de plus.
 
+<p align="center"><img src="../img/keenquad-ui.png" alt="Le menu de KeenQuad et son panneau de confirmation" width="860"></p>
+
 ## Pourquoi la même définition peut être floue ou nette
 
 Chaque taille figure généralement deux fois dans la liste des modes d’affichage de macOS. Sur une dalle 2560 × 1600, pour 1600 × 1000 :

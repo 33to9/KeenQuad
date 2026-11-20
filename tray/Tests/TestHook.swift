@@ -63,6 +63,30 @@ final class TestHook: NSObject {
 
     private var panel: NSPanel? { NSApp.windows.compactMap { $0 as? NSPanel }.first { $0.isVisible } }
 
+    // Captures this process's own on-screen windows (menus, panels) with their shadows; no Screen Recording permission is
+    // needed for one's own windows. Looked up at runtime because the SDK marks the function unavailable.
+    private typealias WindowImageFn = @convention(c) (CGRect, CGWindowListOption, CGWindowID, CGWindowImageOption) -> Unmanaged<CGImage>?
+    private func captureOwnWindows(_ name: String) {
+        guard let sym = dlsym(UnsafeMutableRawPointer(bitPattern: -2), "CGWindowListCreateImage") else { write("shot: no symbol"); return }
+        let fn = unsafeBitCast(sym, to: WindowImageFn.self)
+        let pid = ProcessInfo.processInfo.processIdentifier
+        let infos = (CGWindowListCopyWindowInfo([.optionOnScreenOnly], kCGNullWindowID) as? [[String: Any]]) ?? []
+        for (n, info) in infos.enumerated() where (info[kCGWindowOwnerPID as String] as? Int32) == pid {
+            guard let id = info[kCGWindowNumber as String] as? CGWindowID,
+                  let layer = info[kCGWindowLayer as String] as? Int, layer != 25,   // 25: the status item itself
+                  let img = fn(.null, .optionIncludingWindow, id, [.bestResolution])?.takeRetainedValue() else { continue }
+            let url = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("kq-shot-\(name)-\(n).png")
+            let dest = CGImageDestinationCreateWithURL(url as CFURL, "public.png" as CFString, 1, nil)!
+            CGImageDestinationAddImage(dest, img, nil); CGImageDestinationFinalize(dest)
+            write("shot \(url.path) \(img.width)x\(img.height) layer=\(layer)")
+        }
+    }
+
+    private func after(_ s: TimeInterval, _ f: @escaping () -> Void) {
+        let t = Timer(timeInterval: s, repeats: false) { _ in f() }
+        RunLoop.main.add(t, forMode: .common)   // fires during menu tracking too
+    }
+
     private func key(_ chars: String, code: UInt16) {
         guard let p = panel else { write("key: no panel"); return }
         for type in [NSEvent.EventType.keyDown, .keyUp] {
@@ -103,6 +127,19 @@ final class TestHook: NSObject {
             write("icon size=\(img.size) template=\(img.isTemplate) reps=\(reps) visible=\(d.statusItem.isVisible) windowFrame=\(NSStringFromRect(f)) screenTop=\(NSScreen.main?.frame.maxY ?? 0)")
             snap(b, "icon")
         case "snap": if let p = panel, let v = p.contentView { snap(v, "panel") } else { write("snap: no panel") }
+        case "shotmenu", "shotmenu:dark":   // open the real status menu, capture it, close it
+            let dark = cmd.hasSuffix(":dark")
+            if dark { NSApp.appearance = NSAppearance(named: .darkAqua) }
+            after(0.8) { [weak self] in
+                self?.captureOwnWindows(dark ? "menu-dark" : "menu"); d.menu.cancelTracking(); NSApp.appearance = nil
+            }
+            d.statusItem.button?.performClick(nil)
+        case let c where c.hasPrefix("shotpanel:"):   // shotpanel:<prev w>x<h>:<new w>x<h> shows the real panel without switching anything
+            let s = c.dropFirst(10).split(separator: ":").map { $0.split(separator: "x").compactMap { Int($0) } }
+            guard s.count == 2, s[0].count == 2, s[1].count == 2 else { write("shotpanel: bad size"); return }
+            let p = ConfirmPanel(display: CGMainDisplayID(), previousSize: (s[0][0], s[0][1]), renderSize: (s[1][0] * 2, s[1][1] * 2)) { _ in }
+            p.show()
+            after(0.5) { [weak self] in self?.captureOwnWindows("panel"); p.dismissSilently() }
         case "remove":   // simulate the display being removed through the real C callback
             reconfigurationCallback(CGMainDisplayID(), .removeFlag, Unmanaged.passUnretained(d).toOpaque())
             write("remove callback sent")
