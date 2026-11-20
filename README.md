@@ -105,7 +105,7 @@ cd KeenQuad/tray
 ./Tests/run-selftest.sh     # read-only rule tests, switches nothing
 ```
 
-`./build.sh --package` creates `dist/KeenQuad_vX.Y.Z_macOS.zip` for a release. Developer notes (in Chinese) are in [`tray/README.md`](tray/README.md).
+`./build.sh --package` creates `dist/KeenQuad_vX.Y.Z_macOS.zip` for a release. Developer notes are in [`tray/README.md`](tray/README.md).
 
 ## License
 

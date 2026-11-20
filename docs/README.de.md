@@ -105,7 +105,7 @@ cd KeenQuad/tray
 ./Tests/run-selftest.sh     # Regeltests ohne Schreibzugriff, schaltet nichts um
 ```
 
-`./build.sh --package` erstellt `dist/KeenQuad_vX.Y.Z_macOS.zip` für eine Veröffentlichung. Entwicklernotizen (auf Chinesisch) stehen in [`tray/README.md`](../tray/README.md).
+`./build.sh --package` erstellt `dist/KeenQuad_vX.Y.Z_macOS.zip` für eine Veröffentlichung. Entwicklernotizen (auf Englisch) stehen in [`tray/README.md`](../tray/README.md).
 
 ## Lizenz
 

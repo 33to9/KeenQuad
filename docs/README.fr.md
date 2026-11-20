@@ -105,7 +105,7 @@ cd KeenQuad/tray
 ./Tests/run-selftest.sh     # tests des règles en lecture seule, ne change rien
 ```
 
-`./build.sh --package` crée `dist/KeenQuad_vX.Y.Z_macOS.zip` pour une publication. Les notes de développement (en chinois) se trouvent dans [`tray/README.md`](../tray/README.md).
+`./build.sh --package` crée `dist/KeenQuad_vX.Y.Z_macOS.zip` pour une publication. Les notes de développement (en anglais) se trouvent dans [`tray/README.md`](../tray/README.md).
 
 ## Licence
 

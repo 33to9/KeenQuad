@@ -1,157 +1,104 @@
-# KeenQuad 托盘版 0.4.0
+# KeenQuad developer notes
 
-菜单栏小工具：列出显示器可用的 HiDPI 档位，点一下切换，15 秒内不确认自动还原。文中的条款编号（F1、6.3 等）指本地需求文档，需求文档不放在仓库里。
+How the code is laid out, how to build, test and release it, and the implementation details that are easy to break. For what KeenQuad does and how to install it, see the [main README](../README.md).
 
-## 语言
+## Layout
 
-界面支持 English、简体中文、繁體中文、日本語、Deutsch、한국어、Français、Español。默认跟随系统语言（按系统首选语言列表找第一个支持的语言，都不支持时用英语）。菜单里“登录时启动”下面的“语言”子菜单可以手动指定，选择后下次打开菜单立即生效，不用重启；选“跟随系统”恢复默认。选择保存在 `defaults read com.keenquad.app language`。
+| Path | Contents |
+|---|---|
+| `Sources/CGSPrivate.h` | Declarations of the private CoreGraphics functions and the 212-byte `CGSDisplayMode` struct (bridging header) |
+| `Sources/PrivateDisplay.swift` | The only place that calls private functions: reading the mode table, the current mode, and switching inside a display configuration transaction |
+| `Sources/ModeModel.swift` | Pure data: modes, candidate rules, the "sharp version" rule, the menu text model |
+| `Sources/AppDelegate.swift` | Menu, switching, confirmation, revert, login item, language, update check |
+| `Sources/ConfirmPanel.swift` | The 15-second "Keep this resolution?" panel |
+| `Sources/ConfirmedStore.swift` | Resolutions the user kept, per display |
+| `Sources/Strings.swift` | Languages and all UI text, one table per language |
+| `Sources/UpdateChecker.swift` | Version comparison and the GitHub Releases request |
+| `Tests/main.swift`, `Tests/run-selftest.sh` | Read-only rule tests |
+| `Tests/TestHook.swift` | Test-build-only hook that drives the real menu and panel |
+| `build.sh` | Build, install and package |
 
-## 检查更新
+Private API calls stay in `CGSPrivate.h` and `PrivateDisplay.swift`, so a macOS update that breaks them can be checked in one place.
 
-菜单里版本号下面的“检查更新…”会查询 GitHub 公开仓库 [33to9/KeenQuad](https://github.com/33to9/KeenQuad) 的最新正式版。有新版本时显示版本号和更新说明，点“前往下载”打开 Release 页面，下载 zip 后替换 `/Applications/KeenQuad.app` 即可。只在点击时联网一次，请求里不带任何用户信息，不自动下载或安装。仓库地址写在 `Info.plist` 的 `KQUpdateRepository`。
+## Build
 
-发布新版本：改 `Info.plist` 的版本号，运行 `./build.sh --install --package`，提交并推送，然后 `gh release create v<版本> ../dist/KeenQuad_v<版本>_macOS.zip`。用户也可以用仓库根目录的 `install.sh` 一行命令安装或更新。
+Only the Xcode Command Line Tools are needed.
 
-## 和“系统设置 › 显示器”的区别
-
-系统设置里也能看到 1600 × 1000、2048 × 1280 这类尺寸，但同名不等于同一个档位。系统设置只用公开接口给出的模式清单，这份清单里 1600 × 1000、2048 × 1280、1344 × 840 只有 1 倍版本，对应的 HiDPI 版本（模式表 #29、#32、#27）被隐藏了。1920 × 1080 在模式表里本来就只有 1 倍版本。
-
-2026-11-20 在 ARZOPA（2560 × 1600 面板）上实测，WindowServer 日志里的绘制宽度（`CA Display width`）如下：
-
-| 操作 | 绘制宽度 | 结果 |
-| --- | --- | --- |
-| 系统设置选 1600 × 1000 | 1600 | 1 倍：按 1600 × 1000 绘制再拉伸到面板，发虚 |
-| KeenQuad 选 1600 × 1000 | 3200 | 2 倍 HiDPI（#29）：按 3200 × 2000 绘制再缩到面板，清晰 |
-
-所以：
-
-- 系统设置只用来查看，不要在里面切换。它会把 KeenQuad 设置的当前档位显示为选中，但点同名尺寸切到的可能是 1 倍版本。
-- 当前是有清晰版的 1 倍档位时（例如在系统设置里选了 1600 × 1000），菜单标题注明“（非 HiDPI）”，标题下出现“切换到清晰版 1600 × 1000”。点一下就切到同尺寸的 HiDPI 档位，桌面大小不变，所以不弹确认面板。悬停可以看到原因说明。面板原生的 1 倍档位（2560 × 1600）不经过缩放，不算发虚，不出现这一项。
-- 试用新档位时，确认面板会写明这一档按多大像素渲染，例如“按 4096 × 2560 像素渲染（HiDPI），画面清晰。”
-- 自己核对：运行 `system_profiler SPDisplaysDataType | grep -E "Resolution|UI Looks"`，`Resolution` 是 `UI Looks like` 的两倍才是 HiDPI。
-
-## 构建
-
-只需要命令行工具（不需要 Xcode）：
-
-```sh
-/Volumes/2tmini/KeenQuad/tray/build.sh
+```bash
+./build.sh                       # build ~/Library/Caches/KeenQuad-build/KeenQuad.app
+./build.sh --install             # also update /Applications/KeenQuad.app in place
+./build.sh --package             # also create ../dist/KeenQuad_vX.Y.Z_macOS.zip
 ```
 
-产物：`~/Library/Caches/KeenQuad-build/KeenQuad.app`（在内置盘上构建和签名，临时签名，脚本最后会执行 `codesign --verify --strict`）。
+- The app is built and ad-hoc signed on the internal disk, then checked with `codesign --verify --strict`. Don't build or run it from an exFAT volume: macOS writes `._` companion files there, and they break the code signature.
+- `--install` updates the existing app's contents instead of deleting it, because deleting the app makes macOS drop its login item.
+- Each rebuild changes the ad-hoc signature. If Launch at Login stops working after reinstalling, see "Login item" below.
 
-打包好的产品：`~/Library/Caches/KeenQuad-build/KeenQuad-0.4.0.zip`，另有一份副本在 `dist/KeenQuad-0.4.0.zip`（SHA-256 `4844c473c38b154f4a9efa1586ac33182577725a62cecc33d56f75b6615a5ca1`），并发布在 GitHub Releases。早期版本的包仍保留在 `dist/` 里。
+## Test
 
-只读规则自测（用需求 7.1 的模式表校验 F3/F4，再打印本机菜单，不切换模式）：
-
-```sh
-/Volumes/2tmini/KeenQuad/tray/Tests/run-selftest.sh
+```bash
+./Tests/run-selftest.sh
 ```
 
-## 安装
+It checks the candidate rules, menu text, sharp-version rule, language resolution, every language's strings and the update logic against a fixed mode table, then prints the menu for the connected displays. It switches nothing.
 
-```sh
-/Volumes/2tmini/KeenQuad/tray/build.sh --install
+To exercise the real menu and panel, build the test build:
+
+```bash
+KEENQUAD_TEST=1 ./build.sh       # ~/Library/Caches/KeenQuad-build-test/KeenQuad.app
 ```
 
-或者把 zip 解压后的 `KeenQuad.app` 拖进 `/Applications`。不要从 exFAT 卷（`/Volumes/2tmini`）上直接运行应用。
+- It uses its own bundle ID, `com.keenquad.app.test`, so it never touches the installed app's login item or settings. `build.sh` refuses to install or package it.
+- `Tests/TestHook.swift` listens for the distributed notification `com.keenquad.test`, whose object is a command (`menu`, `click:<title>`, `return`, `esc`, `state`, `snap`, `remove`, `update[:<version>[:<repo>]]`, …). Results go to `$TMPDIR/keenquad-test.txt`.
+- Switching resolution rearranges the windows on screen. Tell whoever is using the Mac before testing, prefer larger desktops, and switch back afterwards.
+- Delete the test build when you're done.
 
-`--install` 原地更新 `/Applications/KeenQuad.app` 的内容，不删除整个应用包：删除后系统会清掉它的登录项记录（0.3.0 安装时遇到过），需要重新开启“登录时启动”。改为原地更新后已复测：重新安装前后登录项是同一条记录，仍为 `[enabled, allowed]`、指向 `/Applications/KeenQuad.app`。
+## Release
 
-## 登录时启动
+1. Bump `CFBundleShortVersionString` and `CFBundleVersion` in `Info.plist`.
+2. `./build.sh --install --package`
+3. Commit and push.
+4. `gh release create vX.Y.Z ../dist/KeenQuad_vX.Y.Z_macOS.zip`, with notes in two parts: "What's new in X.Y.Z" and "Install" (one-line installer, then ZIP with the Gatekeeper steps).
 
-**先把应用放进 `/Applications`，再开启这个开关**：从菜单里勾选“登录时启动”。如果提示失败，可以在“系统设置 › 通用 › 登录项”里手动添加 KeenQuad。
+Installed copies find the release through **Check for Updates…**, which reads the latest non-draft, non-prerelease release of the repository named in `Info.plist` under `KQUpdateRepository`. `../install.sh` installs the release's `_macOS.zip` after checking the SHA-256 that GitHub publishes for it.
 
-## 卸载
+## Implementation notes
 
-1. 在菜单里关闭“登录时启动”，然后选“退出 KeenQuad”。
-2. 删除 `/Applications/KeenQuad.app`。
-3. 可选：`defaults delete com.keenquad.app`。
+### Mode table
 
-## 已知限制
+- A mode is identified by its signature `WIDTHxHEIGHT@DENSITYx@HZ`, for example `1600x1000@2x@60`. Mode numbers are only valid within one enumeration and are never stored.
+- Flag bits, as observed: `0x02000000` is the panel's native timing, `0x00200000` marks the HiDPI modes the public API hides, `0x40000000` marks modes not usable for the desktop.
+- Candidates are modes with density 2.0 that are usable for the desktop, one per size. For each size, the deepest mode with the current refresh rate wins, otherwise the highest refresh rate. Sizes that match the panel's aspect ratio go in the main list, the rest under **Other Aspect Ratios**.
+- "Sharp version": the current mode is 1x, not the panel's native mode, and a candidate of the same size exists. Switching to it skips confirmation because the desktop size and the signal to the panel don't change.
 
-- 使用私有接口 `CGSGetNumberOfDisplayModes`、`CGSGetDisplayModeDescriptionOfLength`、`CGSGetCurrentDisplayMode`、`CGSConfigureDisplayMode`（全部集中在 `Sources/CGSPrivate.h` 和 `Sources/PrivateDisplay.swift`）。系统升级后如果菜单为空或切换失败，请先运行上面的自测脚本，确认模式表是否还在。
-- 只列出系统模式表里已有的 HiDPI 档位，不创建新档位，不选刷新率（沿用当前刷新率）。
-- 处于睡眠状态的显示器不在 `CGGetActiveDisplayList` 的结果里，所以不会出现在菜单中。
-- 临时签名：每次重新构建签名都会变，登录项可能需要关掉再重新打开。
-- 0.3.0 起测试构建使用独立的 Bundle ID `com.keenquad.app.test`，不再影响正式版的登录项和偏好设置。0.2.0 及以前测试构建与产品同一个 Bundle ID，运行过测试构建后，登录项记录会指向测试构建的位置（`sfltool dumpbtm` 可见），只在菜单里关掉再打开不起作用（实测关闭请求被静默忽略）。可靠的修复：在“系统设置 › 通用 › 登录项”的列表里选中 KeenQuad 点“−”，再从菜单开启“登录时启动”，按提示在“允许在后台”里打开 KeenQuad 的开关。完成后 `sfltool dumpbtm` 里应为 `URL: /Applications/KeenQuad.app`、`[enabled, allowed, notified]`。测试完最好删掉测试构建，并用 `lsregister -u` 取消它的登记。
-- 远程连接时可能被改分辨率：第一次重启后，UU 远程建立连接、唤醒屏幕时，档位被改回 1280 × 800（点对点），当时 BetterDisplay 在运行，并在唤醒时请求系统重新检测显示器。第二次重启时 BetterDisplay 没有运行，同样的远程连接没有改变档位。两次样本还不足以下定论，但建议退出并卸载 BetterDisplay。万一再遇到，从菜单重新选一次档位即可。
+### Switching and reverting
 
-## 实现说明
+- A resolution the user hasn't kept is applied with `.forAppOnly`. **Keep** applies it again with `.permanently`. Revert applies the previous mode with `.permanently`. If KeenQuad is killed, `.forAppOnly` makes macOS revert by itself.
+- After switching, the current mode is read back and compared with the target.
+- Revert falls back to `CGRestorePermanentDisplayConfiguration` when the display isn't active (for example asleep) or switching back fails.
+- `SIGTERM`, `SIGINT` and `SIGHUP` go through `NSApp.terminate`, which reverts a pending resolution before quitting.
+- Leaving a resolution marks it as kept, because it was just on screen. The exception is a trial that ended without Keep or Revert because its display was removed; that one is remembered in memory only and never marked as kept.
+- The display reconfiguration callback is used only for display removal. KeenQuad's own switches trigger it too, so other events are ignored.
 
-- 两阶段提交（需求 6.3）：未确认的档位先以 `.forAppOnly` 试用；点“保留”时以 `.permanently` 再提交一次；还原时以 `.permanently` 提交之前的模式（失败时再兜底调用 `CGRestorePermanentDisplayConfiguration`）。应用被 `kill -9` 时系统会自动回到之前的档位（已实测）。普通退出、`SIGTERM`、`SIGINT`、`SIGHUP` 都会先还原再退出。
-- 确认面板是非激活面板，并在显示时调用 `NSApp.activate(ignoringOtherApps: true)`，以便取得键盘焦点；面板结束后调用 `NSApp.hide(nil)` 把焦点交还给之前的应用。
-- 等待确认期间显示器被移除时，那个没保留的试用档位只记在内存里，之后从它切走时不会按 F7.3 被误记为已确认。还原时如果显示器不在活动列表里（例如正在睡眠），改用 `CGRestorePermanentDisplayConfiguration` 撤销试用。
-- 界面文案集中在 `Sources/Strings.swift`，每种语言一张表（结构体实例），漏写一条无法编译。当前语言每次取文案时按“用户指定 → 系统首选语言 → 英语”计算，不依赖 `.lproj`，所以切换后不用重启。
-- `Tests/TestHook.swift` 只在测试构建（`KEENQUAD_TEST=1 ./build.sh`，输出到 `~/Library/Caches/KeenQuad-build-test/`，Bundle ID 为 `com.keenquad.app.test`）中编译，用分布式通知驱动真实菜单项和面板按键，用于下面的验收。产品包里没有它（已用 `nm` 确认）。
+### Confirmation panel
 
-## 复查修复（2026-11-20）
+It's a non-activating panel at modal-panel level with a timer in the `.common` run-loop mode, so the countdown runs during menu tracking. Showing it calls `NSApp.activate(ignoringOtherApps:)`; when it closes, `NSApp.hide(nil)` gives focus back. Text wraps at a fixed width because translations vary in length.
 
-- 修复：等待期间显示器被移除后，未保留的试用档位会在下次切走时被误记为已确认（F7.3 / F6.8）。已复测：0 条误记。
-- 修复：还原时显示器恰好不在活动列表（例如睡眠），原代码直接返回、留下试用档位；现在改用恢复永久配置。
-- 改进：确认结束后把键盘焦点交还给之前的应用。
-- 改进：开启“登录时启动”时如果系统要求批准（`requiresApproval`），弹出提示并打开“系统设置 › 登录项”，避免菜单不打勾、再点也没反应。
-- 复测通过：Esc 还原、超时还原、回车保留、`kill -9` 还原、已确认档位直接切换；空闲 CPU 0%，内存 12 MB。
+### Languages
 
-## 验收结果（2026-11-20，目标机器 ARZOPA，BetterDisplay 当时在运行）
+`Strings.swift` has one `StringTable` instance per language, so a missing string doesn't compile. The current language is computed on every lookup: the user's choice (`UserDefaults` key `language`), else the first supported entry of `Locale.preferredLanguages`, else English. That's why switching languages needs no restart. System Settings paths in the strings use the names from each language's macOS.
 
-| 步骤 | 结果 | 说明 |
-| --- | --- | --- |
-| 0 前提复查 | 通过 | 自测脚本读到 54 条，与 7.1 逐条一致，当前 #29 |
-| 1 一条命令构建 | 通过 | 清空构建目录后 `build.sh` 一次完成，`codesign --verify --strict` 通过；zip 解压后的副本同样通过 |
-| 2 菜单栏图标、无 Dock、无窗口 | 通过 | `LSUIElement=true`，以 accessory 方式运行，没有窗口；图标为 18 pt 模板图（含 18 px 与 36 px），状态栏窗口位于屏幕顶部 30 pt 内。在进程内渲染按钮，浅色菜单栏为深色图形、深色菜单栏为浅色图形，与品牌模板一致 |
-| 3 菜单内容 | 通过 | 测试构建导出的真实 `NSMenu` 与 F4.1 逐行一致（含置灰标题、“点对点”弱化样式、其他比例子菜单、⌘Q） |
-| 4 切到 1920 × 1200 并保留 | 通过 | 面板居中于新的 1920 × 1200 屏幕，倒计时在走，待确认期间档位项全部置灰；回车后 `UI Looks like: 1920 x 1200`，已确认集合写入 |
-| 5 2048 × 1280 超时自动还原 | 通过 | 约 15 秒后自动回到 1920 × 1200，勾回原处（“试用后直接还原”这条之前未核实的路径已实测） |
-| 6 2560 × 1600 按 Esc | 通过 | 立即回到 1920 × 1200 |
-| 7 1600 × 1000 不弹确认 | 通过 | 直接切换，没有面板 |
-| 8 倒计时期间 `kill -9` | 通过 | 系统自动回到 1600 × 1000（`.forAppOnly` 被结束后自动还原，已实测） |
-| 补充：倒计时期间菜单“退出”、`SIGTERM` | 通过 | 都先还原到 1600 × 1000 再退出；点击当前档位不做任何事 |
-| 9 退出后档位不变、重启后勾在原处 | 通过 | |
-| 10 重启 / 注销后保持 | 通过 | 共重启两次。第一次（08:59，BetterDisplay 仍是登录项）：08:59:54 WindowServer 按保存的偏好恢复为 1920 × 1200 HiDPI（渲染宽度 3840），早于 BetterDisplay 启动；09:05:14 UU 远程建立连接、唤醒屏幕时档位被改为 1280 × 800。第二次（09:17，BetterDisplay 已退出且不随登录启动）：09:17:09 恢复为 1920 × 1200；09:21:09 UU 远程建立连接后档位保持不变，现在仍是 1920 × 1200 |
-| 11 登录时启动 | 通过 | 重启后 KeenQuad 在 09:00:00 自动启动（开机 08:59:48），菜单栏图标自动出现；菜单开关此前已反复验证，状态与 `sfltool dumpbtm` 一致 |
-| 12 空闲资源 | 通过 | 空闲 2 分钟 CPU 0.0%（累计 0.10 秒），物理内存占用 12 MB（`footprint`） |
-| 13 结束时档位为 1600 × 1000 | 通过 | |
+### Login item
 
-另外未能实测的项：
+`SMAppService.mainApp` registers the app at its current path. If the login item ever points somewhere else (`sfltool dumpbtm` shows the URL), turning it off and on from the menu may not fix it. Remove KeenQuad in **System Settings → General → Login Items**, turn **Launch at Login** on again from the menu, and allow it under **Allow in the Background**.
 
-- **F6.3 键盘焦点**：通过。最初测试时屏幕处于锁定状态，任何应用都拿不到焦点；解锁后复测，面板成为键窗口（`key=true`，应用到前台），回车保留、Esc 还原都直接生效。面板结束后焦点交还给之前的应用。面板在浅色 / 深色外观下的渲染都已检查。
-- **F6.8 拔掉显示器**：没有物理插拔，但用测试构建通过真实的 C 回调送入事件：`setModeFlag`（本工具自己切换）被忽略，面板继续倒计时；`removeFlag` 让等待静默结束，不报错、不还原，档位项恢复可点，并记录日志。
+### Stored data
 
-## 0.2 验收结果（2026-11-20，目标机器 ARZOPA，BetterDisplay 已卸载）
+Only `UserDefaults` in the `com.keenquad.app` domain: `confirmedModes` (display UUID → kept signatures) and `language`. No other files are written.
 
-| 步骤 | 结果 | 说明 |
-| --- | --- | --- |
-| 1 至 3 重新执行 | 通过 | `build.sh` 一次完成，`codesign --verify --strict` 通过，产品二进制里没有 TestHook；当前为 HiDPI 时菜单与 F4.1 逐行一致，没有修复项 |
-| 14 F12.1 规则自测 | 通过 | 17→29、21→31、22→32、15→27、18→30、12→11，24 号（原生）和 19 号（1920 × 1080）没有修复项；自测全部通过 |
-| 15 切到 17 号后看菜单 | 通过 | 标题“ARZOPA　当前 1600 × 1000（非 HiDPI）”，下一行“切换到清晰版 1600 × 1000”，悬停提示与 F12.3 一致；1600 × 1000 档位不打勾 |
-| 16 点击修复项 | 通过 | 没有确认面板；`Resolution: 3200 x 2000`，WindowServer 日志渲染宽度从 1600 变为 3200；勾回到 1600 × 1000，修复项消失 |
-| 17 试用 2048 × 1280 | 通过 | 面板三行：“保留这个分辨率吗？”“按 4096 × 2560 像素渲染（HiDPI），画面清晰。”“14 秒后自动还原为 1600 × 1000。”，没有截断；面板为键窗口；按 Esc 立即还原 |
-| 18 结束时档位 | 通过 | 1600 × 1000 HiDPI（29 号），与测试前相同 |
+## Known limitations
 
-## 0.3 验收结果（2026-11-20，目标机器 ARZOPA，系统语言 zh-Hans-SG）
-
-| 步骤 | 结果 | 说明 |
-| --- | --- | --- |
-| 1 至 3 重新执行 | 通过 | `build.sh` 一次完成，`codesign --verify --strict` 通过，产品二进制里没有 TestHook；简体中文下菜单与 F4.1 一致（底部多了“语言 ▸”） |
-| 19 只读自测 | 通过 | v0.1、v0.2 自测在简体中文下全部通过；20 组系统语言代码归并正确（含 `zh-Hans-HK`→简体、`zh-HK`→繁体、`pt_BR`→英语、`it` 跳过）；8 种语言文案无空白、占位符齐全 |
-| 20 语言子菜单 | 通过 | 跟随系统 / 分隔线 / 8 种语言，顺序与名称符合 F13.1，勾在“跟随系统”，菜单为简体中文 |
-| 21 依次选择 8 种语言 | 通过 | 每次重新打开菜单都是所选语言、勾在所选语言上，`language` 键为对应代码 |
-| 22 英文确认面板 | 通过 | 面板全英文，按 Esc 还原；德文面板（最长）同样检查，长句自动换行，没有截断 |
-| 23 跟随系统 | 通过 | 回到简体中文，`language` 键被删除 |
-| 24 重启应用后保持 | 通过 | 选 Français 后退出再启动，仍为法语 |
-| 补充：重新安装保留登录项 | 通过 | `build.sh --install` 原地更新后，登录项记录不变（同一 UUID，`enabled, allowed`）；已安装的二进制与 `KeenQuad-0.3.0.zip` 中的一致 |
-
-## 0.4 验收结果（2026-11-20，目标机器 ARZOPA）
-
-| 步骤 | 结果 | 说明 |
-| --- | --- | --- |
-| 1 至 3 重新执行 | 通过 | `build.sh` 一次完成，签名校验通过，产品二进制里没有 TestHook |
-| 25 只读自测 | 通过 | 版本解析与比较（含 `0.4` 等于 `0.4.0`、`v` 前缀、非数字段）、Release 解码、404 / HTTP 错误 / 网络错误 / 内容无法解析、说明截断、8 种语言新文案全部通过 |
-| 26 菜单底部 | 通过 | 版本行下面是“检查更新…”，再下面是“退出 KeenQuad” |
-| 27 已是最新 | 通过 | 发布 `v0.4.0` 后，0.4.0 检查结果为“KeenQuad 已是最新版本 / 当前版本 0.4.0。” |
-| 28 有新版本 | 通过 | 以 0.3.0 身份检查：“有新版本 KeenQuad 0.4.0”，显示更新说明，按钮“前往下载”（默认）/“以后再说”，链接为 `https://github.com/33to9/KeenQuad/releases/tag/v0.4.0`；英文界面同样检查。另用 `cli/cli` 仓库验证了长说明截断 |
-| 29 检查失败 | 通过 | 不存在的仓库：“无法检查更新 / 还没有发布任何版本。”；仓库地址无效：“未配置更新地址。”；应用不崩溃。没有实际断网测试，网络错误路径由自测覆盖 |
-| 30 检查进行中 | 通过 | 菜单项显示“正在检查更新…”并置灰 |
-| 补充：发布 | 通过 | 公开仓库 `33to9/KeenQuad`，Release `v0.4.0` 附件 SHA-256 与本地 zip 一致；重新安装后登录项仍为 `enabled, allowed` |
-
+- Private functions may change in a future macOS. If the menu is empty or switching fails, run the self-test first to see whether the mode table is still readable.
+- KeenQuad only switches to modes macOS already has. It doesn't create resolutions or choose refresh rates.
+- Displays that are asleep aren't in `CGGetActiveDisplayList`, so they don't appear in the menu.
+- Some remote-desktop connections and display utilities make macOS re-detect displays on wake, which can reset the resolution to the default. Pick the resolution again from the menu.

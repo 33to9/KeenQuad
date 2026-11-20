@@ -105,7 +105,7 @@ cd KeenQuad/tray
 ./Tests/run-selftest.sh     # 唯讀規則自我測試，不會切換解析度
 ```
 
-`./build.sh --package` 會產生用於發佈的 `dist/KeenQuad_vX.Y.Z_macOS.zip`。開發說明（簡體中文）見 [`tray/README.md`](../tray/README.md)。
+`./build.sh --package` 會產生用於發佈的 `dist/KeenQuad_vX.Y.Z_macOS.zip`。開發說明（英文）見 [`tray/README.md`](../tray/README.md)。
 
 ## 授權
 

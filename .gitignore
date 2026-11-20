@@ -1,11 +1,12 @@
-# macOS / exFAT 伴生文件
+# macOS / exFAT companion files
 ._*
 .DS_Store
-# 不公开的内容
+# Not published
 KeenQuad-Brand-Kit/
 task-proof/
 KeenQuad_v1_0.md
-# 构建产物通过 GitHub Releases 发布
+# Build output is published through GitHub Releases
 dist/
-# 内部需求文档，只留在本地
+# Internal spec docs and notes stay local
 KeenQuad_Tray_v*.md
+tray/DEV-NOTES.zh-Hans.md
