@@ -21,6 +21,9 @@ macOS 的顯示模式表裡，同一個尺寸通常有兩筆記錄。以 2560 ×
 | 1 倍 | 以 1600 × 1000 像素繪製，再放大到面板 | 模糊 |
 | HiDPI | 以 3200 × 2000 像素繪製，再縮小到面板 | 清晰 |
 
+<p align="center"><img src="../img/blurry-vs-sharp.png" alt="系統設定的 1600 × 1000（左）與 KeenQuad 的 1600 × 1000（右）" width="700"></p>
+<p align="center"><sub>同樣兩行「系統設定」文字在 2560 × 1600 面板上的效果，由截圖模擬並放大 4 倍。</sub></p>
+
 「系統設定 › 顯示器」只列出公開介面提供的模式，而公開介面隱藏了許多 HiDPI 版本。在那裡選 1600 × 1000，得到的是 1 倍版本。目前模式是 KeenQuad 切換的 HiDPI 檔位時，「系統設定」會因為名稱相同而顯示為已選取，再點一次就會切到模糊的版本。
 
 想確認目前用的是哪一種，可以執行 `system_profiler SPDisplaysDataType`：HiDPI 下 **Resolution** 是 **UI Looks like** 的兩倍。

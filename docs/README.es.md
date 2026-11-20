@@ -21,6 +21,9 @@ Cada tamaño suele aparecer dos veces en la lista de modos de pantalla de macOS.
 | 1x | Renderiza 1600 × 1000 píxeles y los estira hasta el panel | Borrosa |
 | HiDPI | Renderiza 3200 × 2000 píxeles y los reduce hasta el panel | Nítida |
 
+<p align="center"><img src="../img/blurry-vs-sharp.png" alt="1600 × 1000 desde Ajustes del Sistema (izquierda) y desde KeenQuad (derecha)" width="700"></p>
+<p align="center"><sub>Las mismas dos filas de Ajustes del Sistema tal como las muestra un panel de 2560 × 1600, recreadas a partir de capturas de pantalla y ampliadas 4 veces.</sub></p>
+
 Ajustes del Sistema › Pantallas solo muestra los modos de la interfaz pública, que oculta muchas versiones HiDPI. Si eliges 1600 × 1000 ahí, obtienes la versión 1x. Cuando el modo actual es uno HiDPI elegido con KeenQuad, Ajustes del Sistema muestra seleccionado el que tiene el mismo nombre; si vuelves a hacer clic en él, pasas a la versión borrosa.
 
 Para saber cuál usas, ejecuta `system_profiler SPDisplaysDataType`: en HiDPI, **Resolution** es el doble de **UI Looks like**.

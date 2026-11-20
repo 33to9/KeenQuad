@@ -21,6 +21,9 @@ Each size usually exists twice in macOS's display mode table. On a 2560 × 1600 
 | 1x | Renders 1600 × 1000 pixels, then stretches them up to the panel | Blurry |
 | HiDPI | Renders 3200 × 2000 pixels, then scales them down to the panel | Sharp |
 
+<p align="center"><img src="img/blurry-vs-sharp.png" alt="1600 × 1000 from System Settings (left) and from KeenQuad (right)" width="700"></p>
+<p align="center"><sub>The same two rows of System Settings as a 2560 × 1600 panel shows them, simulated from screenshots and magnified 4×.</sub></p>
+
 System Settings › Displays only lists modes from the public API, which hides many HiDPI versions. When you pick 1600 × 1000 there, you get the 1x one. When the current mode is a HiDPI one set by KeenQuad, System Settings shows the same name as selected; clicking it again switches you to the blurry version.
 
 To check what you're using, run `system_profiler SPDisplaysDataType`: in HiDPI, **Resolution** is twice **UI Looks like**.

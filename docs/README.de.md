@@ -21,6 +21,9 @@ Jede Größe steht in der Liste der Anzeigemodi von macOS meist zweimal. Bei ein
 | 1x | Rendert 1600 × 1000 Pixel und streckt sie auf das Panel | Unscharf |
 | HiDPI | Rendert 3200 × 2000 Pixel und verkleinert sie auf das Panel | Scharf |
 
+<p align="center"><img src="../img/blurry-vs-sharp.png" alt="1600 × 1000 aus den Systemeinstellungen (links) und aus KeenQuad (rechts)" width="700"></p>
+<p align="center"><sub>Dieselben zwei Zeilen der Systemeinstellungen, wie ein 2560 × 1600-Panel sie zeigt – aus Bildschirmfotos nachgebildet und 4-fach vergrößert.</sub></p>
+
 Systemeinstellungen › Displays zeigt nur Modi aus der öffentlichen Schnittstelle, und die verbirgt viele HiDPI-Versionen. Wählst du dort 1600 × 1000, bekommst du die 1x-Version. Ist gerade ein von KeenQuad eingestellter HiDPI-Modus aktiv, zeigen die Systemeinstellungen den gleichnamigen Eintrag als ausgewählt an; klickst du ihn erneut an, wechselst du zur unscharfen Version.
 
 Was gerade aktiv ist, zeigt `system_profiler SPDisplaysDataType`: Bei HiDPI ist **Resolution** doppelt so groß wie **UI Looks like**.

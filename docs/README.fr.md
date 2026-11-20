@@ -21,6 +21,9 @@ Chaque taille figure généralement deux fois dans la liste des modes d’affich
 | 1x | Calcule 1600 × 1000 pixels, puis les étire sur la dalle | Flou |
 | HiDPI | Calcule 3200 × 2000 pixels, puis les réduit sur la dalle | Net |
 
+<p align="center"><img src="../img/blurry-vs-sharp.png" alt="1600 × 1000 depuis Réglages Système (à gauche) et depuis KeenQuad (à droite)" width="700"></p>
+<p align="center"><sub>Les deux mêmes lignes de Réglages Système telles qu’une dalle 2560 × 1600 les affiche, reconstituées à partir de captures d’écran et agrandies 4 fois.</sub></p>
+
 Réglages Système › Moniteurs ne propose que les modes de l’interface publique, qui masque de nombreuses versions HiDPI. Si vous y choisissez 1600 × 1000, vous obtenez la version 1x. Lorsque le mode actuel est un mode HiDPI réglé par KeenQuad, Réglages Système affiche le nom identique comme sélectionné ; cliquer à nouveau dessus vous fait passer à la version floue.
 
 Pour savoir ce que vous utilisez, exécutez `system_profiler SPDisplaysDataType` : en HiDPI, **Resolution** vaut le double de **UI Looks like**.
