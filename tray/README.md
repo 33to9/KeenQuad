@@ -61,9 +61,50 @@ KEENQUAD_TEST=1 ./build.sh       # ~/Library/Caches/KeenQuad-build-test/KeenQuad
 1. Bump `CFBundleShortVersionString` and `CFBundleVersion` in `Info.plist`.
 2. `./build.sh --install --package`
 3. Commit and push.
-4. `gh release create vX.Y.Z ../dist/KeenQuad_vX.Y.Z.dmg ../dist/KeenQuad.dmg ../dist/KeenQuad_vX.Y.Z_macOS.zip`, with notes in two parts: "What's new in X.Y.Z" and "Install" (one-line installer, then DMG with the Gatekeeper steps). The DMGs are for people downloading by hand: `KeenQuad.dmg` is the same image under a fixed name, which the README links to as `releases/latest/download/KeenQuad.dmg`. `install.sh` uses the ZIP.
+4. Write the notes from the template below, then publish all three files:
+   ```bash
+   gh release create vX.Y.Z --title "KeenQuad X.Y.Z" --notes-file notes.md \
+     ../dist/KeenQuad_vX.Y.Z.dmg ../dist/KeenQuad.dmg ../dist/KeenQuad_vX.Y.Z_macOS.zip
+   ```
+   The DMGs are for people downloading by hand: `KeenQuad.dmg` is the same image under a fixed name, which the README links to as `releases/latest/download/KeenQuad.dmg`, so every release must include it. `install.sh` uses the ZIP.
 
 Installed copies find the release through **Check for Updates…**, which reads the latest non-draft, non-prerelease release of the repository named in `Info.plist` under `KQUpdateRepository`. `../install.sh` installs the release's `_macOS.zip` after checking the SHA-256 that GitHub publishes for it.
+
+### Release notes
+
+Keep the notes in English and in two parts. **Check for Updates…** shows only the first 600 characters, so "What's new" comes first and starts with anything users must do themselves (for example, turning a setting back on).
+
+- "What's new": user-visible changes only, as short bullets. Bold a bullet's lead-in when it calls for action.
+- "Install": the same text every release, apart from the version and the DMG link. The DMG link points to this version's file, not to `latest`, so it still gives this version after newer ones come out.
+
+Template (replace `X.Y.Z` throughout):
+
+````markdown
+### What's new in X.Y.Z
+
+- **Something users must do, if any.** Why, and how.
+- A user-visible change.
+
+## KeenQuad X.Y.Z
+
+### Install
+**Already installed?** Use **Check for Updates…** in KeenQuad's menu, or run the one-line installer below, which updates the app in place.
+
+**One-line install (no Gatekeeper warning)** — paste into Terminal:
+```
+curl -fsSL https://raw.githubusercontent.com/33to9/KeenQuad/main/install.sh | bash
+```
+
+**DMG:** download [KeenQuad_vX.Y.Z.dmg](https://github.com/33to9/KeenQuad/releases/download/vX.Y.Z/KeenQuad_vX.Y.Z.dmg), open it and drag KeenQuad onto the Applications folder. The app is not notarized by Apple, so the first launch is blocked once:
+- **macOS 15 and later**: double-click (a warning appears), then **System Settings → Privacy & Security** → scroll down → **Open Anyway**
+- **macOS 14**: right-click the app → **Open**
+
+Requires a Mac with Apple silicon and macOS 14 or later. No permissions needed.
+
+Licensed under GPL-3.0-only. The KeenQuad name and icons are reserved; see TRADEMARK.md.
+````
+
+After publishing, check that each download link in the notes works and that `releases/latest/download/KeenQuad.dmg` gives the new version.
 
 ## Implementation notes
 
