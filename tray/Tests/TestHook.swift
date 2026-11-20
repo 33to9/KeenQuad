@@ -140,6 +140,11 @@ final class TestHook: NSObject {
             let p = ConfirmPanel(display: CGMainDisplayID(), previousSize: (s[0][0], s[0][1]), renderSize: (s[1][0] * 2, s[1][1] * 2)) { _ in }
             p.show()
             after(0.5) { [weak self] in self?.captureOwnWindows("panel"); p.dismissSilently() }
+        case "loginreminder":   // snapshot the reminder alert without showing it
+            let alert = d.makeLoginReminderAlert()
+            alert.layout()
+            write("loginreminder title=\(alert.messageText) | body=\(alert.informativeText) | buttons=\(alert.buttons.map(\.title))")
+            if let v = alert.window.contentView { snap(v, "loginreminder") }
         case "remove":   // simulate the display being removed through the real C callback
             reconfigurationCallback(CGMainDisplayID(), .removeFlag, Unmanaged.passUnretained(d).toOpaque())
             write("remove callback sent")

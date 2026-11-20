@@ -113,6 +113,11 @@ struct StringTable {
     let updateBadResponse: String
     let httpError: (Int) -> String
     let badVersion: (String) -> String
+    // Login item reminder after updating from 0.4.0
+    let loginReminderTitle: String
+    let loginReminderBody: String
+    let turnOn: String
+    let noThanks: String
 }
 
 extension StringTable {
@@ -167,7 +172,11 @@ extension StringTable {
         noReleases: "No versions have been released yet.",
         updateBadResponse: "The server’s response couldn’t be read.",
         httpError: { "The server returned HTTP \($0)." },
-        badVersion: { "Unrecognized version “\($0)”." })
+        badVersion: { "Unrecognized version “\($0)”." },
+        loginReminderTitle: "Turn Launch at Login back on?",
+        loginReminderBody: "If KeenQuad started at login before this update, it doesn't anymore: this version has a new identity, so macOS treats it as a new app. If System Settings › General › Login Items then lists KeenQuad twice, remove the older one.",
+        turnOn: "Turn On",
+        noThanks: "No Thanks")
 
     static let zhHans = StringTable(
         gap: "\u{3000}",
@@ -207,7 +216,11 @@ extension StringTable {
         noReleases: "还没有发布任何版本。",
         updateBadResponse: "无法识别服务器返回的内容。",
         httpError: { "服务器返回 HTTP \($0)。" },
-        badVersion: { "无法识别版本号“\($0)”。" })
+        badVersion: { "无法识别版本号“\($0)”。" },
+        loginReminderTitle: "重新开启“登录时启动”？",
+        loginReminderBody: "如果更新前 KeenQuad 会在登录时自动启动，现在不会了：这个版本换了新的应用标识，macOS 把它当作新应用。开启后如果“系统设置 › 通用 › 登录项”里有两个 KeenQuad，请移除旧的那个。",
+        turnOn: "开启",
+        noThanks: "不用了")
 
     static let zhHant = StringTable(
         gap: "\u{3000}",
@@ -247,7 +260,11 @@ extension StringTable {
         noReleases: "尚未發佈任何版本。",
         updateBadResponse: "無法辨識伺服器回傳的內容。",
         httpError: { "伺服器回傳 HTTP \($0)。" },
-        badVersion: { "無法辨識版本號「\($0)」。" })
+        badVersion: { "無法辨識版本號「\($0)」。" },
+        loginReminderTitle: "重新開啟「登入時啟動」？",
+        loginReminderBody: "如果更新前 KeenQuad 會在登入時自動啟動，現在不會了：這個版本換了新的 App 識別碼，macOS 把它當作新 App。開啟後如果「系統設定 › 一般 › 登入項目」裡有兩個 KeenQuad，請移除舊的那個。",
+        turnOn: "開啟",
+        noThanks: "不用了")
 
     static let ja = StringTable(
         gap: "\u{3000}",
@@ -287,7 +304,11 @@ extension StringTable {
         noReleases: "まだリリースされたバージョンがありません。",
         updateBadResponse: "サーバの応答を読み取れませんでした。",
         httpError: { "サーバが HTTP \($0) を返しました。" },
-        badVersion: { "バージョン「\($0)」を認識できません。" })
+        badVersion: { "バージョン「\($0)」を認識できません。" },
+        loginReminderTitle: "「ログイン時に起動」をもう一度オンにしますか？",
+        loginReminderBody: "このアップデートの前に KeenQuad がログイン時に起動していた場合、今は起動しません。このバージョンは識別子が新しくなったため、macOS は別のアプリとして扱います。オンにした後「システム設定 › 一般 › ログイン項目」に KeenQuad が 2 つある場合は、古いほうを削除してください。",
+        turnOn: "オンにする",
+        noThanks: "今はしない")
 
     static let de = StringTable(
         gap: "  ",
@@ -327,7 +348,11 @@ extension StringTable {
         noReleases: "Es wurde noch keine Version veröffentlicht.",
         updateBadResponse: "Die Antwort des Servers konnte nicht gelesen werden.",
         httpError: { "Der Server hat HTTP \($0) zurückgegeben." },
-        badVersion: { "Unbekannte Version „\($0)“." })
+        badVersion: { "Unbekannte Version „\($0)“." },
+        loginReminderTitle: "„Beim Anmelden starten“ wieder einschalten?",
+        loginReminderBody: "Wenn KeenQuad vor diesem Update beim Anmelden gestartet ist, tut es das jetzt nicht mehr: Diese Version hat eine neue Kennung, deshalb behandelt macOS sie als neue App. Steht KeenQuad danach unter „Systemeinstellungen › Allgemein › Anmeldeobjekte“ zweimal, entferne den älteren Eintrag.",
+        turnOn: "Einschalten",
+        noThanks: "Nein danke")
 
     static let ko = StringTable(
         gap: "  ",
@@ -367,7 +392,11 @@ extension StringTable {
         noReleases: "아직 출시된 버전이 없습니다.",
         updateBadResponse: "서버 응답을 읽을 수 없습니다.",
         httpError: { "서버가 HTTP \($0)을(를) 반환했습니다." },
-        badVersion: { "인식할 수 없는 버전 ‘\($0)’." })
+        badVersion: { "인식할 수 없는 버전 ‘\($0)’." },
+        loginReminderTitle: "‘로그인 시 실행’을 다시 켜시겠습니까?",
+        loginReminderBody: "업데이트 전에 KeenQuad가 로그인 시 실행되었다면 이제는 실행되지 않습니다. 이번 버전은 식별자가 바뀌어 macOS가 새 앱으로 인식하기 때문입니다. 켠 뒤 ‘시스템 설정 › 일반 › 로그인 항목’에 KeenQuad가 두 개 있으면 이전 항목을 제거하십시오.",
+        turnOn: "켜기",
+        noThanks: "괜찮습니다")
 
     static let fr = StringTable(
         gap: "  ",
@@ -407,7 +436,11 @@ extension StringTable {
         noReleases: "Aucune version n’a encore été publiée.",
         updateBadResponse: "La réponse du serveur est illisible.",
         httpError: { "Le serveur a renvoyé HTTP \($0)." },
-        badVersion: { "Version « \($0) » non reconnue." })
+        badVersion: { "Version « \($0) » non reconnue." },
+        loginReminderTitle: "Réactiver « Ouvrir à la connexion » ?",
+        loginReminderBody: "Si KeenQuad s’ouvrait à la connexion avant cette mise à jour, ce n’est plus le cas : cette version a un nouvel identifiant, et macOS la considère comme une nouvelle app. Si Réglages Système › Général › Ouverture affiche ensuite KeenQuad deux fois, supprimez l’ancienne entrée.",
+        turnOn: "Activer",
+        noThanks: "Non merci")
 
     static let es = StringTable(
         gap: "  ",
@@ -447,7 +480,11 @@ extension StringTable {
         noReleases: "Aún no se ha publicado ninguna versión.",
         updateBadResponse: "No se pudo leer la respuesta del servidor.",
         httpError: { "El servidor devolvió HTTP \($0)." },
-        badVersion: { "Versión “\($0)” no reconocida." })
+        badVersion: { "Versión “\($0)” no reconocida." },
+        loginReminderTitle: "¿Volver a activar «Abrir al iniciar sesión»?",
+        loginReminderBody: "Si KeenQuad se abría al iniciar sesión antes de esta actualización, ya no lo hace: esta versión tiene un identificador nuevo y macOS la trata como una app nueva. Si después Ajustes del Sistema › General › Ítems de inicio muestra KeenQuad dos veces, elimina la entrada antigua.",
+        turnOn: "Activar",
+        noThanks: "No, gracias")
 }
 
 // MARK: - Accessors (look up the current language's table)
@@ -511,4 +548,10 @@ enum L10n {
         case .badVersion(let tag): return t.badVersion(tag)
         }
     }
+
+    // Login item reminder
+    static var loginReminderTitle: String { t.loginReminderTitle }
+    static var loginReminderBody: String { t.loginReminderBody }
+    static var turnOn: String { t.turnOn }
+    static var noThanks: String { t.noThanks }
 }

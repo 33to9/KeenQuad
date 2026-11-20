@@ -144,6 +144,24 @@ for lang in AppLanguage.allCases {
 
 print(failures == 0 ? "Self-test: all passed" : "Self-test: \(failures) failed")
 
+// Login item reminder after updating from 0.4.0: once, product build only, only for Macs that used 0.4.0
+check(LoginReminder.decide(isProduct: true, legacySettingsExist: true, loginEnabled: false, alreadyDone: false) == .show, "reminder: 0.4.0 user, login off")
+check(LoginReminder.decide(isProduct: true, legacySettingsExist: true, loginEnabled: true, alreadyDone: false) == .markDone, "reminder: login already on")
+check(LoginReminder.decide(isProduct: true, legacySettingsExist: true, loginEnabled: false, alreadyDone: true) == .nothing, "reminder: only once")
+check(LoginReminder.decide(isProduct: true, legacySettingsExist: false, loginEnabled: false, alreadyDone: false) == .nothing, "reminder: never used 0.4.0")
+check(LoginReminder.decide(isProduct: false, legacySettingsExist: true, loginEnabled: false, alreadyDone: false) == .nothing, "reminder: not in the test build")
+// Each language names its own Login Items path, the same one its other login item messages use
+let loginPaths: [AppLanguage: String] = [.en: "General › Login Items", .zhHans: "通用 › 登录项", .zhHant: "一般 › 登入項目", .ja: "一般 › ログイン項目",
+                                         .de: "Allgemein › Anmeldeobjekte", .ko: "일반 › 로그인 항목", .fr: "Général › Ouverture", .es: "General › Ítems de inicio"]
+for lang in AppLanguage.allCases {
+    let t = StringTable.table(for: lang)
+    let texts = [t.loginReminderTitle, t.loginReminderBody, t.turnOn, t.noThanks]
+    check(!texts.contains { $0.trimmingCharacters(in: .whitespaces).isEmpty }, "\(lang.rawValue): empty reminder string")
+    let path = loginPaths[lang] ?? "?"
+    check(t.loginReminderBody.contains(path) && t.loginItemNeedsApproval.contains(path), "\(lang.rawValue): reminder names \(path)")
+    check(t.loginReminderTitle.contains(t.launchAtLogin), "\(lang.rawValue): reminder title uses the menu item's name")
+}
+
 // Connected displays, read-only
 print("\nConnected displays (read-only):")
 for (i, d) in Displays.active().enumerated() {

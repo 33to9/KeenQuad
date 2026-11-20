@@ -68,6 +68,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         #if KEENQUAD_TEST
         TestHook.shared.install(self)
         #endif
+        // After the status item is up, so the menu bar icon is already there when the alert appears
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in self?.remindAboutLoginItemIfNeeded() }
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
@@ -333,21 +335,54 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     // MARK: - Other menu actions
 
     @objc private func toggleLaunchAtLogin(_ sender: NSMenuItem) {
+        if SMAppService.mainApp.status == .enabled {
+            do { try SMAppService.mainApp.unregister() }
+            catch { showAlert(L10n.loginItemFailedTitle, L10n.loginItemFailedBody(error.localizedDescription)) }
+        } else {
+            enableLaunchAtLogin()
+        }
+    }
+
+    private func enableLaunchAtLogin() {
         let service = SMAppService.mainApp
         do {
-            if service.status == .enabled {
-                try service.unregister()
-            } else {
-                try service.register()
-                // macOS may require approval in System Settings › General › Login Items; without it the item stays unchecked and clicking again does nothing
-                if service.status == .requiresApproval {
-                    showAlert(L10n.loginItemFailedTitle, L10n.loginItemNeedsApproval)
-                    SMAppService.openSystemSettingsLoginItems()
-                }
+            try service.register()
+            // macOS may require approval in System Settings › General › Login Items; without it the item stays unchecked and clicking again does nothing
+            if service.status == .requiresApproval {
+                showAlert(L10n.loginItemFailedTitle, L10n.loginItemNeedsApproval)
+                SMAppService.openSystemSettingsLoginItems()
             }
         } catch {
             showAlert(L10n.loginItemFailedTitle, L10n.loginItemFailedBody(error.localizedDescription))
         }
+    }
+
+    // MARK: - Login item reminder after updating from 0.4.0
+
+    private func remindAboutLoginItemIfNeeded() {
+        let defaults = UserDefaults.standard
+        let decision = LoginReminder.decide(
+            isProduct: Bundle.main.bundleIdentifier == LoginReminder.productBundleID,
+            legacySettingsExist: defaults.persistentDomain(forName: LoginReminder.legacyBundleID) != nil,
+            loginEnabled: SMAppService.mainApp.status == .enabled,
+            alreadyDone: defaults.bool(forKey: LoginReminder.doneKey))
+        log.info("login reminder: \(String(describing: decision), privacy: .public)")
+        guard decision != .nothing else { return }
+        defaults.set(true, forKey: LoginReminder.doneKey)   // ask at most once, whatever the answer
+        guard decision == .show else { return }
+        NSApp.activate(ignoringOtherApps: true)
+        if makeLoginReminderAlert().runModal() == .alertFirstButtonReturn { enableLaunchAtLogin() }
+        NSApp.hide(nil)
+    }
+
+    /// Internal so the test build can snapshot it.
+    func makeLoginReminderAlert() -> NSAlert {
+        let alert = NSAlert()
+        alert.messageText = L10n.loginReminderTitle
+        alert.informativeText = L10n.loginReminderBody
+        alert.addButton(withTitle: L10n.turnOn)
+        alert.addButton(withTitle: L10n.noThanks)
+        return alert
     }
 
     @objc private func quit(_ sender: Any?) { NSApp.terminate(nil) }

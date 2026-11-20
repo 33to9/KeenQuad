@@ -14,6 +14,7 @@ How the code is laid out, how to build, test and release it, and the implementat
 | `Sources/ConfirmedStore.swift` | Resolutions the user kept, per display |
 | `Sources/Strings.swift` | Languages and all UI text, one table per language |
 | `Sources/UpdateChecker.swift` | Version comparison and the GitHub Releases request |
+| `Sources/LoginReminder.swift` | When to ask 0.4.0 users to turn Launch at Login back on |
 | `Tests/main.swift`, `Tests/run-selftest.sh` | Read-only rule tests |
 | `Tests/TestHook.swift` | Test-build-only hook that drives the real menu and panel |
 | `build.sh` | Build, install and package |
@@ -42,7 +43,7 @@ Only the Xcode Command Line Tools are needed.
 ./Tests/run-selftest.sh
 ```
 
-It checks the candidate rules, menu text, sharp-version rule, language resolution, every language's strings and the update logic against a fixed mode table, then prints the menu for the connected displays. It switches nothing.
+It checks the candidate rules, menu text, sharp-version rule, language resolution, every language's strings, the update logic and the login reminder rule against a fixed mode table, then prints the menu for the connected displays. It switches nothing.
 
 To exercise the real menu and panel, build the test build:
 
@@ -51,7 +52,7 @@ KEENQUAD_TEST=1 ./build.sh       # ~/Library/Caches/KeenQuad-build-test/KeenQuad
 ```
 
 - It uses its own bundle ID, `com.pivotfrag.keenquad.test`, so it never touches the installed app's login item or settings. `build.sh` refuses to install or package it.
-- `Tests/TestHook.swift` listens for the distributed notification `com.pivotfrag.keenquad.testhook`, whose object is a command (`menu`, `click:<title>`, `return`, `esc`, `state`, `snap`, `remove`, `update[:<version>[:<repo>]]`, …). Results go to `$TMPDIR/keenquad-test.txt`.
+- `Tests/TestHook.swift` listens for the distributed notification `com.pivotfrag.keenquad.testhook`, whose object is a command (`menu`, `click:<title>`, `return`, `esc`, `state`, `snap`, `remove`, `update[:<version>[:<repo>]]`, `loginreminder`, …). Results go to `$TMPDIR/keenquad-test.txt`.
 - `shotmenu` and `shotpanel:<WxH>:<WxH>` capture the real menu and confirmation panel (previous and new size) as PNGs in `$TMPDIR`, without switching anything. They capture only KeenQuad's own windows, so no Screen Recording permission is needed. The README screenshot `img/keenquad-ui.png` was made this way with the language set to English.
 - Switching resolution rearranges the windows on screen. Tell whoever is using the Mac before testing, prefer larger desktops, and switch back afterwards.
 - Delete the test build when you're done.
@@ -138,7 +139,7 @@ It's a non-activating panel at modal-panel level with a timer in the `.common` r
 
 ### Stored data
 
-Only `UserDefaults` in the `com.pivotfrag.keenquad` domain: `confirmedModes` (display UUID → kept signatures), `language` and `migratedLegacySettings`. On first launch, `main.swift` copies the first two from `com.keenquad.app`, the bundle ID that 0.4.0 used. No other files are written.
+Only `UserDefaults` in the `com.pivotfrag.keenquad` domain: `confirmedModes` (display UUID → kept signatures), `language`, `migratedLegacySettings` and `loginReminderDone`. On first launch, `main.swift` copies the first two from `com.keenquad.app`, the bundle ID that 0.4.0 used. Its login item can't be carried over, so if 0.4.0's settings exist and Launch at Login is off, KeenQuad asks once whether to turn it on (`LoginReminder.swift`). No other files are written.
 
 ## Known limitations
 

@@ -4,8 +4,8 @@ import AppKit
 
 // Exit if another instance with the same bundle ID is already running.
 // 0.4.0 shipped with the bundle ID com.keenquad.app; a copy of it still running counts as another instance.
-let productID = "com.pivotfrag.keenquad"
-let legacyID = "com.keenquad.app"
+let productID = LoginReminder.productBundleID
+let legacyID = LoginReminder.legacyBundleID
 let bundleID = Bundle.main.bundleIdentifier ?? productID
 let instanceIDs = bundleID == productID ? [productID, legacyID] : [bundleID]
 let others = instanceIDs.flatMap { NSRunningApplication.runningApplications(withBundleIdentifier: $0) }
