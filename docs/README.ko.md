@@ -56,9 +56,9 @@ curl -fsSL https://raw.githubusercontent.com/33to9/KeenQuad/main/install.sh | ba
 
 스크립트는 GitHub에서 최신 릴리스를 다운로드하고 SHA-256을 확인한 뒤 ‘응용 프로그램’에 설치하고 실행합니다. curl로 다운로드한 파일에는 격리 표시가 붙지 않으므로 macOS가 처음 실행을 막지 않습니다. KeenQuad가 이미 설치되어 있으면 그 자리에서 업데이트되며 ‘로그인 시 실행’ 설정도 유지됩니다. 스크립트가 짧으니 먼저 [읽어 보셔도](../install.sh) 됩니다.
 
-### 방법 2: ZIP
+### 방법 2: DMG
 
-[Releases](https://github.com/33to9/KeenQuad/releases/latest)에서 최신 `KeenQuad_vX.Y.Z_macOS.zip`을 다운로드하고 압축을 푼 뒤 KeenQuad를 ‘응용 프로그램’ 폴더로 옮기십시오.
+[Releases](https://github.com/33to9/KeenQuad/releases/latest)에서 최신 `KeenQuad_vX.Y.Z.dmg`를 다운로드해 열고 KeenQuad를 ‘응용 프로그램’ 폴더로 드래그하십시오.
 
 이 앱은 Apple의 공증을 받지 않았기 때문에 macOS가 처음 실행을 한 번 막습니다.
 - **macOS 15 이상**: 이중 클릭(경고가 나타남)한 다음 **시스템 설정 → 개인정보 보호 및 보안**을 열고, 아래로 스크롤하여 **그래도 열기**를 클릭
@@ -110,7 +110,7 @@ cd KeenQuad/tray
 ./Tests/run-selftest.sh     # 읽기 전용 규칙 테스트, 해상도를 바꾸지 않음
 ```
 
-`./build.sh --package`는 릴리스용 `dist/KeenQuad_vX.Y.Z_macOS.zip`을 만듭니다. 개발 노트(영어)는 [`tray/README.md`](../tray/README.md)에 있습니다.
+`./build.sh --package`는 릴리스용 `dist/KeenQuad_vX.Y.Z.dmg`와 `dist/KeenQuad_vX.Y.Z_macOS.zip`을 만듭니다. 개발 노트(영어)는 [`tray/README.md`](../tray/README.md)에 있습니다.
 
 ## 라이선스
 

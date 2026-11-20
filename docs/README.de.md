@@ -56,9 +56,9 @@ curl -fsSL https://raw.githubusercontent.com/33to9/KeenQuad/main/install.sh | ba
 
 Das Skript lädt die neueste Version von GitHub, prüft die SHA-256-Prüfsumme, installiert sie in „Programme“ und öffnet sie. Mit curl geladene Dateien tragen keine Quarantäne-Markierung, daher blockiert macOS den ersten Start nicht. Ist KeenQuad schon installiert, wird es an Ort und Stelle aktualisiert und behält die Einstellung „Beim Anmelden starten“. Das Skript ist kurz – du kannst es gern vorher [lesen](../install.sh).
 
-### Option 2: ZIP
+### Option 2: DMG
 
-Lade die neueste `KeenQuad_vX.Y.Z_macOS.zip` unter [Releases](https://github.com/33to9/KeenQuad/releases/latest), entpacke sie und bewege KeenQuad in den Ordner „Programme“.
+Lade die neueste `KeenQuad_vX.Y.Z.dmg` unter [Releases](https://github.com/33to9/KeenQuad/releases/latest), öffne sie und ziehe KeenQuad auf den Ordner „Programme“.
 
 Die App ist nicht von Apple notariell beglaubigt, daher blockiert macOS den ersten Start einmal:
 - **macOS 15 und neuer**: Doppelklicken (eine Warnung erscheint), dann **Systemeinstellungen → Datenschutz & Sicherheit** öffnen, nach unten scrollen und auf **Dennoch öffnen** klicken
@@ -110,7 +110,7 @@ cd KeenQuad/tray
 ./Tests/run-selftest.sh     # Regeltests ohne Schreibzugriff, schaltet nichts um
 ```
 
-`./build.sh --package` erstellt `dist/KeenQuad_vX.Y.Z_macOS.zip` für eine Veröffentlichung. Entwicklernotizen (auf Englisch) stehen in [`tray/README.md`](../tray/README.md).
+`./build.sh --package` erstellt `dist/KeenQuad_vX.Y.Z.dmg` und `dist/KeenQuad_vX.Y.Z_macOS.zip` für eine Veröffentlichung. Entwicklernotizen (auf Englisch) stehen in [`tray/README.md`](../tray/README.md).
 
 ## Lizenz
 

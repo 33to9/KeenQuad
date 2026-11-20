@@ -17,6 +17,7 @@ How the code is laid out, how to build, test and release it, and the implementat
 | `Tests/main.swift`, `Tests/run-selftest.sh` | Read-only rule tests |
 | `Tests/TestHook.swift` | Test-build-only hook that drives the real menu and panel |
 | `build.sh` | Build, install and package |
+| `make-dmg.sh`, `Resources/dmg/` | The drag-to-Applications disk image and its window background |
 
 Private API calls stay in `CGSPrivate.h` and `PrivateDisplay.swift`, so a macOS update that breaks them can be checked in one place.
 
@@ -27,11 +28,12 @@ Only the Xcode Command Line Tools are needed.
 ```bash
 ./build.sh                       # build ~/Library/Caches/KeenQuad-build/KeenQuad.app
 ./build.sh --install             # also update /Applications/KeenQuad.app in place
-./build.sh --package             # also create ../dist/KeenQuad_vX.Y.Z_macOS.zip
+./build.sh --package             # also create ../dist/KeenQuad_vX.Y.Z.dmg and _macOS.zip
 ```
 
 - The app is built and ad-hoc signed on the internal disk, then checked with `codesign --verify --strict`. Don't build or run it from an exFAT volume: macOS writes `._` companion files there, and they break the code signature.
 - `--install` updates the existing app's contents instead of deleting it, because deleting the app makes macOS drop its login item.
+- `--package` builds the disk image with `make-dmg.sh`, which sets the window layout through Finder. The first run asks for permission to control Finder; without it the image still works but has no background or icon positions. Eject any mounted "KeenQuad" volume first.
 - Each rebuild changes the ad-hoc signature. If Launch at Login stops working after reinstalling, see "Login item" below.
 
 ## Test
@@ -59,7 +61,7 @@ KEENQUAD_TEST=1 ./build.sh       # ~/Library/Caches/KeenQuad-build-test/KeenQuad
 1. Bump `CFBundleShortVersionString` and `CFBundleVersion` in `Info.plist`.
 2. `./build.sh --install --package`
 3. Commit and push.
-4. `gh release create vX.Y.Z ../dist/KeenQuad_vX.Y.Z_macOS.zip`, with notes in two parts: "What's new in X.Y.Z" and "Install" (one-line installer, then ZIP with the Gatekeeper steps).
+4. `gh release create vX.Y.Z ../dist/KeenQuad_vX.Y.Z.dmg ../dist/KeenQuad_vX.Y.Z_macOS.zip`, with notes in two parts: "What's new in X.Y.Z" and "Install" (one-line installer, then DMG with the Gatekeeper steps). The DMG is for people downloading by hand; `install.sh` uses the ZIP.
 
 Installed copies find the release through **Check for Updates…**, which reads the latest non-draft, non-prerelease release of the repository named in `Info.plist` under `KQUpdateRepository`. `../install.sh` installs the release's `_macOS.zip` after checking the SHA-256 that GitHub publishes for it.
 

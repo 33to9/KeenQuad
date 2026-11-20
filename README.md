@@ -56,9 +56,9 @@ curl -fsSL https://raw.githubusercontent.com/33to9/KeenQuad/main/install.sh | ba
 
 The script downloads the latest release from GitHub, verifies its SHA-256, installs it to Applications and opens it. Files downloaded with curl carry no quarantine flag, so macOS doesn't block the first launch. If KeenQuad is already installed, it's updated in place and keeps its Launch at Login setting. The script is short — feel free to [read it](install.sh) first.
 
-### Option 2: ZIP
+### Option 2: DMG
 
-Download the latest `KeenQuad_vX.Y.Z_macOS.zip` from [Releases](../../releases/latest), unzip it and move KeenQuad into your Applications folder.
+Download the latest `KeenQuad_vX.Y.Z.dmg` from [Releases](../../releases/latest), open it and drag KeenQuad onto the Applications folder.
 
 The app is not notarized by Apple, so macOS blocks the first launch once:
 - **macOS 15 and later**: double-click (a warning appears), then open **System Settings → Privacy & Security**, scroll down and click **Open Anyway**
@@ -110,7 +110,7 @@ cd KeenQuad/tray
 ./Tests/run-selftest.sh     # read-only rule tests, switches nothing
 ```
 
-`./build.sh --package` creates `dist/KeenQuad_vX.Y.Z_macOS.zip` for a release. Developer notes are in [`tray/README.md`](tray/README.md).
+`./build.sh --package` creates `dist/KeenQuad_vX.Y.Z.dmg` and `dist/KeenQuad_vX.Y.Z_macOS.zip` for a release. Developer notes are in [`tray/README.md`](tray/README.md).
 
 ## License
 

@@ -56,9 +56,9 @@ curl -fsSL https://raw.githubusercontent.com/33to9/KeenQuad/main/install.sh | ba
 
 腳本會從 GitHub 下載最新版本、驗證 SHA-256、安裝到「應用程式」並打開。用 curl 下載的檔案不帶隔離標記，所以 macOS 不會阻擋第一次打開。如果已經安裝過 KeenQuad，會就地更新，並保留「登入時啟動」的設定。腳本很短，可以先[看一看](../install.sh)。
 
-### 方式 2：ZIP
+### 方式 2：DMG
 
-從 [Releases](https://github.com/33to9/KeenQuad/releases/latest) 下載最新的 `KeenQuad_vX.Y.Z_macOS.zip`，解壓縮後把 KeenQuad 移到「應用程式」檔案夾。
+從 [Releases](https://github.com/33to9/KeenQuad/releases/latest) 下載最新的 `KeenQuad_vX.Y.Z.dmg`，打開後把 KeenQuad 拖到「應用程式」檔案夾上。
 
 這個 App 沒有經過 Apple 公證，macOS 會阻擋一次第一次打開：
 - **macOS 15 及以上版本**：按兩下（會出現警告），然後打開 **系統設定 → 隱私權與安全性**，向下捲動，點 **強制打開**
@@ -110,7 +110,7 @@ cd KeenQuad/tray
 ./Tests/run-selftest.sh     # 唯讀規則自我測試，不會切換解析度
 ```
 
-`./build.sh --package` 會產生用於發佈的 `dist/KeenQuad_vX.Y.Z_macOS.zip`。開發說明（英文）見 [`tray/README.md`](../tray/README.md)。
+`./build.sh --package` 會產生用於發佈的 `dist/KeenQuad_vX.Y.Z.dmg` 和 `dist/KeenQuad_vX.Y.Z_macOS.zip`。開發說明（英文）見 [`tray/README.md`](../tray/README.md)。
 
 ## 授權
 
