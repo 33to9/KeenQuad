@@ -48,9 +48,9 @@ main() {
         | grep -B1 '_macOS\.zip"' | grep -o 'sha256:[0-9a-f]\{64\}' | head -1 | cut -d: -f2 || true)
     [ -n "$digest" ] || fail "The release has no checksum for the zip."
 
-    local tmp
+    # Global (not local): the EXIT trap runs after main has returned.
     tmp=$(mktemp -d)
-    trap 'rm -rf "$tmp"' EXIT
+    trap 'rm -rf "${tmp:-}"' EXIT
 
     say "Downloading KeenQuad ${tag}…"
     curl -fL --progress-bar -o "$tmp/KeenQuad.zip" "$url" || fail "Download failed."
