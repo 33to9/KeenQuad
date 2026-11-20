@@ -90,6 +90,7 @@ KeenQuad ne collecte rien et n’envoie aucune statistique. Il ne se connecte à
 1. Dans le menu de KeenQuad, désactivez **Ouvrir à la connexion**, puis choisissez **Quitter KeenQuad**.
 2. Supprimez `/Applications/KeenQuad.app`.
 3. Facultatif : exécutez `defaults delete com.pivotfrag.keenquad`.
+4. Si vous avez mis à jour depuis la 0.4.0 : exécutez aussi `defaults delete com.keenquad.app` et supprimez l’éventuelle entrée KeenQuad restante dans **Réglages Système › Général › Ouverture**.
 
 La définition utilisée reste en place ; changez-la dans Réglages Système si vous le souhaitez.
 

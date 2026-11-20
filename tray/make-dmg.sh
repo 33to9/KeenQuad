@@ -5,7 +5,8 @@
 # Usage: ./make-dmg.sh <path/to/KeenQuad.app> <output.dmg>
 #
 # The window layout (background, icon positions) is set through Finder, so the first run may ask
-# for permission to control Finder. If that's refused, the image still works, just without the layout.
+# for permission to control Finder. If the layout can't be set, the script fails, so a plain image
+# never gets released by accident. KEENQUAD_DMG_ALLOW_PLAIN=1 builds it without the layout instead.
 set -eu
 
 APP="$1"; DMG="$2"
@@ -56,7 +57,12 @@ tell application "Finder"
 end tell
 EOF
 then echo "DMG layout set"
-else echo "Warning: couldn't set the DMG window layout (Finder automation refused?); the image still works" >&2
+elif [ "${KEENQUAD_DMG_ALLOW_PLAIN:-}" = "1" ]; then
+  echo "Warning: couldn't set the DMG window layout; building a plain image (KEENQUAD_DMG_ALLOW_PLAIN=1)" >&2
+else
+  echo "Couldn't set the DMG window layout through Finder. Allow this app to control Finder in" >&2
+  echo "System Settings › Privacy & Security › Automation, or set KEENQUAD_DMG_ALLOW_PLAIN=1 to build without it." >&2
+  exit 1
 fi
 
 # Volume icon. Added after mounting and after Finder is done: hdiutil -srcfolder leaves

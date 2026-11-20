@@ -90,6 +90,7 @@ KeenQuad sammelt nichts und hat keine Telemetrie. Es verbindet sich nur mit dem 
 1. Schalte im Menü von KeenQuad **Beim Anmelden starten** aus und wähle dann **KeenQuad beenden**.
 2. Lösche `/Applications/KeenQuad.app`.
 3. Optional: Führe `defaults delete com.pivotfrag.keenquad` aus.
+4. Falls du von 0.4.0 aktualisiert hast: Führe zusätzlich `defaults delete com.keenquad.app` aus und entferne einen übrig gebliebenen KeenQuad-Eintrag unter **Systemeinstellungen › Allgemein › Anmeldeobjekte**.
 
 Die aktuelle Auflösung bleibt erhalten; du kannst sie in den Systemeinstellungen ändern.
 

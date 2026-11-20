@@ -90,6 +90,7 @@ KeenQuad no recopila nada y no tiene telemetría. Solo se conecta a internet cua
 1. En el menú de KeenQuad, desactiva **Abrir al iniciar sesión** y elige **Salir de KeenQuad**.
 2. Elimina `/Applications/KeenQuad.app`.
 3. Opcional: ejecuta `defaults delete com.pivotfrag.keenquad`.
+4. Si actualizaste desde la 0.4.0: ejecuta también `defaults delete com.keenquad.app` y elimina cualquier entrada de KeenQuad que quede en **Ajustes del Sistema › General › Ítems de inicio**.
 
 La resolución que estés usando se mantiene; cámbiala en Ajustes del Sistema si quieres.
 

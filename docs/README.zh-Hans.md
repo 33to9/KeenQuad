@@ -90,6 +90,7 @@ KeenQuad 不收集任何数据，没有统计功能。只有在你点 **检查�
 1. 在 KeenQuad 的菜单里关闭 **登录时启动**，然后选 **退出 KeenQuad**。
 2. 删除 `/Applications/KeenQuad.app`。
 3. 可选：运行 `defaults delete com.pivotfrag.keenquad`。
+4. 如果是从 0.4.0 更新上来的：再运行 `defaults delete com.keenquad.app`，并在 **系统设置 › 通用 › 登录项** 里移除残留的 KeenQuad 条目。
 
 当前使用的分辨率会保持不变，需要的话可以在“系统设置”里改。
 

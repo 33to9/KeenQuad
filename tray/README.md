@@ -33,7 +33,7 @@ Only the Xcode Command Line Tools are needed.
 
 - The app is built and ad-hoc signed on the internal disk, then checked with `codesign --verify --strict`. Don't build or run it from an exFAT volume: macOS writes `._` companion files there, and they break the code signature.
 - `--install` updates the existing app's contents instead of deleting it, because deleting the app makes macOS drop its login item.
-- `--package` builds the disk image with `make-dmg.sh`, which sets the window layout through Finder. The first run asks for permission to control Finder; without it the image still works but has no background or icon positions. Eject any mounted "KeenQuad" volume first.
+- `--package` builds the disk image with `make-dmg.sh`, which sets the window layout through Finder. The first run asks for permission to control Finder. Without it the build stops, so a DMG without its background and icon positions can't be released by accident; `KEENQUAD_DMG_ALLOW_PLAIN=1` builds one anyway. Eject any mounted "KeenQuad" volume first.
 - Each rebuild changes the ad-hoc signature. If Launch at Login stops working after reinstalling, see "Login item" below.
 
 ## Test

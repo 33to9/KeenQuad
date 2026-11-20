@@ -90,6 +90,7 @@ KeenQuad는 아무것도 수집하지 않으며 사용 통계도 없습니다. *
 1. KeenQuad 메뉴에서 **로그인 시 실행**을 끄고 **KeenQuad 종료**를 선택하십시오.
 2. `/Applications/KeenQuad.app`을 삭제하십시오.
 3. 선택 사항: `defaults delete com.pivotfrag.keenquad`을 실행하십시오.
+4. 0.4.0에서 업데이트한 경우: `defaults delete com.keenquad.app`도 실행하고, **시스템 설정 › 일반 › 로그인 항목**에 남아 있는 KeenQuad 항목이 있으면 제거하십시오.
 
 사용 중인 해상도는 그대로 유지됩니다. 원하면 ‘시스템 설정’에서 바꾸십시오.
 

@@ -68,8 +68,11 @@ main() {
     # The checksum above is the integrity check; the signature check is informational
     # (the app is ad-hoc signed, not notarized).
     codesign --verify --strict "$app" 2>/dev/null || say "Warning: code signature could not be verified."
-    [ "$(defaults read "$app/Contents/Info.plist" CFBundleIdentifier)" = "$BUNDLE_ID" ] \
-        || fail "Unexpected bundle identifier."
+    # 0.4.0 used the legacy bundle ID, so installing it with KEENQUAD_VERSION=0.4.0 must still work
+    local app_id
+    app_id=$(defaults read "$app/Contents/Info.plist" CFBundleIdentifier)
+    [ "$app_id" = "$BUNDLE_ID" ] || [ "$app_id" = "$LEGACY_BUNDLE_ID" ] \
+        || fail "Unexpected bundle identifier: ${app_id}."
 
     # Quit a running copy so it can be replaced. Quitting reverts an unconfirmed resolution.
     if pgrep -xq KeenQuad; then

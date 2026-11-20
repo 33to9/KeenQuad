@@ -90,6 +90,7 @@ KeenQuad collects nothing and has no telemetry. It connects to the internet only
 1. In KeenQuad's menu, turn off **Launch at Login**, then choose **Quit KeenQuad**.
 2. Delete `/Applications/KeenQuad.app`.
 3. Optional: run `defaults delete com.pivotfrag.keenquad`.
+4. If you updated from 0.4.0: also run `defaults delete com.keenquad.app`, and remove any leftover KeenQuad entry in **System Settings › General › Login Items**.
 
 The resolution you're using stays; change it in System Settings if you like.
 

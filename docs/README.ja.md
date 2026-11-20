@@ -90,6 +90,7 @@ KeenQuad は何も収集せず、利用統計もありません。インター�
 1. KeenQuad のメニューで **ログイン時に起動** をオフにし、**KeenQuad を終了** を選びます。
 2. `/Applications/KeenQuad.app` を削除します。
 3. 必要なら `defaults delete com.pivotfrag.keenquad` を実行します。
+4. 0.4.0 からアップデートした場合は、`defaults delete com.keenquad.app` も実行し、**システム設定 › 一般 › ログイン項目** に残っている KeenQuad の項目があれば削除します。
 
 使用中の解像度はそのまま残ります。変更したい場合は「システム設定」で変更してください。
 
