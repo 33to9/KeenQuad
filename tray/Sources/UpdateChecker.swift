@@ -2,7 +2,7 @@
 // Copyright © 2026 33to9
 import Foundation
 
-/// 检查更新的纯逻辑（F14 / v0.4 第 3 节），与网络和界面无关，便于自测。
+/// Update-check logic without networking or UI, so it can be tested on its own.
 enum UpdateLogic {
     enum Failure: Equatable {
         case notConfigured
@@ -21,7 +21,7 @@ enum UpdateLogic {
 
     static let notesLimit = 600
 
-    /// `v0.4.0` → [0, 4, 0]；有非数字段时为 nil。
+    /// `v0.4.0` → [0, 4, 0]; nil if any part isn't a number.
     static func parse(_ text: String) -> [Int]? {
         var t = text.trimmingCharacters(in: .whitespacesAndNewlines)
         if t.hasPrefix("v") || t.hasPrefix("V") { t.removeFirst() }
@@ -35,7 +35,7 @@ enum UpdateLogic {
         return result
     }
 
-    /// 逐段比较，缺的段按 0 计。
+    /// Compares part by part; a missing part counts as 0.
     static func isNewer(_ a: [Int], than b: [Int]) -> Bool {
         for i in 0..<max(a.count, b.count) {
             let x = i < a.count ? a[i] : 0
@@ -45,7 +45,7 @@ enum UpdateLogic {
         return false
     }
 
-    /// `owner/repo` 形式才有效。
+    /// Only `owner/repo` is valid.
     static func isValidRepository(_ s: String?) -> Bool {
         guard let s else { return false }
         return s.range(of: #"^[A-Za-z0-9-]+/[A-Za-z0-9._-]+$"#, options: .regularExpression) != nil
@@ -62,7 +62,7 @@ enum UpdateLogic {
         let body: String?
     }
 
-    /// 根据一次请求的结果得出结论。
+    /// Turns one request's result into an outcome.
     static func evaluate(data: Data?, status: Int?, errorDescription: String?, current: String) -> Outcome {
         if let errorDescription { return .failed(.network(errorDescription)) }
         guard let status else { return .failed(.badResponse) }
@@ -79,7 +79,7 @@ enum UpdateLogic {
     }
 }
 
-/// 一次手动检查（F14.2）：后台请求，结果回到主线程。不保存任何结果（F14.7）。
+/// One manual check: requests in the background and calls back on the main thread. Nothing is stored.
 final class UpdateChecker {
     private(set) var isChecking = false
 
@@ -102,7 +102,7 @@ final class UpdateChecker {
         isChecking = true
         var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 15)
         request.setValue("application/vnd.github+json", forHTTPHeaderField: "Accept")
-        request.setValue("KeenQuad/\(current)", forHTTPHeaderField: "User-Agent")   // N3：不带用户信息
+        request.setValue("KeenQuad/\(current)", forHTTPHeaderField: "User-Agent")   // no user information
         let session = URLSession(configuration: .ephemeral)
         session.dataTask(with: request) { [weak self] data, response, error in
             let outcome = UpdateLogic.evaluate(data: data,

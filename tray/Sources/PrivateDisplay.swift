@@ -4,9 +4,9 @@ import CoreGraphics
 import ColorSync
 import Foundation
 
-/// 私有接口的全部调用都在这里（N5）。系统升级后出问题时先查这个文件和 CGSPrivate.h。
+/// Every private API call lives here. If a macOS update breaks something, check this file and CGSPrivate.h first.
 enum PrivateDisplay {
-    /// F2.4：读取完整模式表。
+    /// Reads the full display mode table.
     static func modeTable(of display: CGDirectDisplayID) -> [Mode] {
         var count: Int32 = 0
         CGSGetNumberOfDisplayModes(display, &count)
@@ -20,14 +20,14 @@ enum PrivateDisplay {
         }
     }
 
-    /// F2.4：当前模式号。
+    /// The current mode number.
     static func currentModeNumber(of display: CGDirectDisplayID) -> Int32 {
         var number: Int32 = -1
         CGSGetCurrentDisplayMode(display, &number)
         return number
     }
 
-    /// F5.2 / 6.2：在显示配置事务中按模式号切换。
+    /// Switches to a mode number inside a display configuration transaction.
     static func apply(_ modeNumber: Int32, on display: CGDirectDisplayID, option: CGConfigureOption) -> CGError {
         var config: CGDisplayConfigRef?
         var err = CGBeginDisplayConfiguration(&config)
@@ -41,9 +41,9 @@ enum PrivateDisplay {
     }
 }
 
-/// 公开的显示器辅助函数。
+/// Display helpers built on public APIs.
 enum Displays {
-    /// F2.2：活动显示器，主显示器在前。
+    /// Active displays, main display first.
     static func active() -> [CGDirectDisplayID] {
         var count: UInt32 = 0
         guard CGGetActiveDisplayList(0, nil, &count) == .success, count > 0 else { return [] }
@@ -58,7 +58,7 @@ enum Displays {
         return ids
     }
 
-    /// F7.1：显示器 UUID 字符串。
+    /// The display's UUID string.
     static func uuid(of display: CGDirectDisplayID) -> String {
         guard let unmanaged = CGDisplayCreateUUIDFromDisplayID(display) else { return "display-\(display)" }
         let uuid = unmanaged.takeRetainedValue()

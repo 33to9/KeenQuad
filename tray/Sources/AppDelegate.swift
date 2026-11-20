@@ -4,11 +4,11 @@ import AppKit
 import ServiceManagement
 import os
 
-/// 菜单项携带的选择信息。只保存签名，不保存模式号（6.6）。
+/// What a menu item selects. Stores the signature, never the mode number (numbers aren't stable).
 private final class ModeChoice: NSObject {
     let display: CGDirectDisplayID
     let signature: String
-    /// F12 清晰版修复项：同尺寸从 1 倍切到 HiDPI，不弹确认。
+    /// The "Switch to Sharp" item: same size, 1x to HiDPI, no confirmation.
     let isSharpFix: Bool
     init(display: CGDirectDisplayID, signature: String, isSharpFix: Bool = false) {
         self.display = display
@@ -26,17 +26,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let panel: ConfirmPanel
     }
 
-    private(set) var statusItem: NSStatusItem!   // 内部可读：仅供测试构建
-    let menu = NSMenu()   // 内部可见：仅供测试构建的 TestHook 读取
+    private(set) var statusItem: NSStatusItem!   // internal read access for the test build only
+    let menu = NSMenu()   // internal so the test build's TestHook can read it
     private var pending: Pending?
-    /// 以 forAppOnly 试用、但既没保留也没还原就结束等待的模式（例如 F6.8 显示器被移除）。显示器 UUID → 模式签名。
-    /// 只在内存中，用来避免 F7.3 把一个从未确认过的试用档位误记为已确认。
+    /// Trials applied with .forAppOnly that ended without Keep or Revert (e.g. the display was removed). Display UUID → signature.
+    /// Kept in memory only, so that leaving such a mode doesn't mark it as kept.
     private var unkeptTrial: [String: String] = [:]
     private var signalSources: [DispatchSourceSignal] = []
-    let updateChecker = UpdateChecker()   // 内部可见：仅供测试构建
+    let updateChecker = UpdateChecker()   // internal for the test build
     private let log = Logger(subsystem: Bundle.main.bundleIdentifier ?? "com.keenquad.app", category: "switch")
 
-    // MARK: - 生命周期
+    // MARK: - Lifecycle
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
@@ -54,10 +54,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         menu.delegate = self
         statusItem.menu = menu
 
-        // F10.2：只用于 F6.8
+        // Used only to notice a display being removed during confirmation
         CGDisplayRegisterReconfigurationCallback(reconfigurationCallback, Unmanaged.passUnretained(self).toOpaque())
 
-        // F6.7：普通的 kill / Ctrl-C / 挂断也走正常退出流程，先还原再退出
+        // kill, Ctrl-C and hangup go through normal termination, which reverts a pending trial first
         for sig in [SIGTERM, SIGINT, SIGHUP] {
             signal(sig, SIG_IGN)
             let source = DispatchSource.makeSignalSource(signal: sig, queue: .main)
@@ -79,7 +79,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         return .terminateNow
     }
 
-    // MARK: - 菜单
+    // MARK: - Menu
 
     func menuNeedsUpdate(_ menu: NSMenu) { rebuildMenu() }   // F2.1
 
@@ -104,7 +104,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0.4.0"
         menu.addItem(disabledItem(L10n.version(version)))
 
-        // F14.1 / F14.2：检查进行中显示“正在检查更新…”并置灰
+        // While checking, show "Checking for Updates…" disabled
         let checking = updateChecker.isChecking
         let update = NSMenuItem(title: checking ? L10n.checkingForUpdates : L10n.checkForUpdates,
                                 action: #selector(checkForUpdates(_:)), keyEquivalent: "")
@@ -154,7 +154,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private func modeItem(_ c: Candidate, display: CGDirectDisplayID) -> NSMenuItem {
         let text = MenuText.itemTitle(c)
         let item = NSMenuItem(title: text.main, action: #selector(selectMode(_:)), keyEquivalent: "")
-        if let tag = text.tag {   // F4.4：较弱的视觉
+        if let tag = text.tag {   // shown in a weaker style
             let s = NSMutableAttributedString(string: text.main, attributes: [.font: NSFont.menuFont(ofSize: 0)])
             s.append(NSAttributedString(string: L10n.gap + tag, attributes: [
                 .font: NSFont.menuFont(ofSize: NSFont.smallSystemFontSize),
@@ -169,7 +169,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         return item
     }
 
-    /// F13.1：跟随系统、分隔线、各语言（用本语言文字），当前选择打勾（F13.2）。
+    /// Follow System, a separator, then each language in its own script; the current choice is checked.
     private func languageItem() -> NSMenuItem {
         let sub = NSMenu()
         sub.autoenablesItems = false
@@ -191,7 +191,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         return item
     }
 
-    /// F13.3 / F13.4：立即保存，下次显示起生效；选“跟随系统”时删除键。
+    /// Saved right away and used from the next time anything is shown; Follow System removes the key.
     @objc private func selectLanguage(_ sender: NSMenuItem) {
         LanguageSetting.choice = (sender.representedObject as? String).flatMap(AppLanguage.init(rawValue:))
         log.info("language \(LanguageSetting.choice?.rawValue ?? "system", privacy: .public) -> \(LanguageSetting.current.rawValue, privacy: .public)")
@@ -209,19 +209,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }?.localizedName
     }
 
-    // MARK: - 切换（F5 / F6 / F7）
+    // MARK: - Switching
 
     @objc private func selectMode(_ sender: NSMenuItem) {
         guard pending == nil, let choice = sender.representedObject as? ModeChoice else { return }
         let display = choice.display
         guard Displays.active().contains(display) else { return }
 
-        // 重新枚举，只允许切到本次枚举得到的候选（F5.4）
+        // Enumerate again and only switch to a candidate from this enumeration
         let table = PrivateDisplay.modeTable(of: display)
         let currentNumber = PrivateDisplay.currentModeNumber(of: display)
         let candidates = CandidateRules.compute(table: table, currentNumber: currentNumber)
         guard let target = CandidateRules.find(signature: choice.signature, in: candidates) else { return }
-        // F12：修复项只在当前仍是它对应的 1 倍模式时有效
+        // The sharp-version item only applies while the current mode is still its 1x counterpart
         if choice.isSharpFix && candidates.sharpVersion?.mode.signature != target.signature { return }
         guard target.number != currentNumber else { return }   // F5.1
 
@@ -233,14 +233,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let confirmed = choice.isSharpFix || target.isNative
             || ConfirmedStore.contains(target.signature, uuid: uuid)   // F12.4 / F7.2 / F7.4
 
-        // 已确认：直接持久生效；未确认：先以 forAppOnly 试用（6.3）
+        // Kept before: apply permanently. Otherwise try it with .forAppOnly first
         let option: CGConfigureOption = confirmed ? .permanently : .forAppOnly
         let label = choice.isSharpFix ? "sharpen" : (confirmed ? "apply" : "trial")
         guard perform(target, on: display, uuid: uuid, from: previous, option: option, label: label) else {
             return
         }
         if choice.isSharpFix { ConfirmedStore.add(target.signature, uuid: uuid) }   // F12.4
-        // F7.3：切走的模式刚刚在正常显示，记为已确认；但未保留的试用档位除外
+        // The mode we're leaving was just on screen, so mark it as kept, unless it was an unkept trial
         if let previous, unkeptTrial[uuid] != previous.signature {
             ConfirmedStore.add(previous.signature, uuid: uuid)
         }
@@ -268,15 +268,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         case .revert:   // F6.5
             revert(p)
         }
-        // 面板是为了拿键盘焦点才激活本应用的；结束后把焦点交还给之前的应用
+        // The panel activated us only to get keyboard focus; give focus back to the previous app
         NSApp.hide(nil)
     }
 
-    /// 以 `.permanently` 切回之前的模式；还原本身不再弹确认（F6.5）。
+    /// Switches back to the previous mode with `.permanently`. Reverting never asks for confirmation.
     private func revert(_ p: Pending) {
         guard Displays.active().contains(p.display) else {
-            // 显示器此刻不在活动列表里（例如睡眠）：无法按模式号切换，直接恢复系统保存的永久配置。
-            // 除了这次试用，本工具的所有切换都是 permanently 提交的，所以这只会撤销试用。
+            // The display isn't active (e.g. asleep), so we can't switch by mode number; restore the saved permanent configuration.
+            // Every switch except this trial was applied permanently, so this only undoes the trial.
             CGRestorePermanentDisplayConfiguration()
             log.info("revert uuid=\(p.uuid, privacy: .public) display inactive, restorePermanent")
             return
@@ -287,13 +287,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
            perform(mode, on: p.display, uuid: p.uuid, from: p.target, option: .permanently, label: "revert", reportErrors: false) {
             return
         }
-        // 兜底：恢复系统保存的永久配置（试用是以 forAppOnly 提交的，永久配置仍是之前的模式）
+        // Fallback: restore the permanent configuration (the trial was .forAppOnly, so it still holds the previous mode)
         CGRestorePermanentDisplayConfiguration()
         let now = PrivateDisplay.currentModeNumber(of: p.display)
         log.error("revert fallback uuid=\(p.uuid, privacy: .public) restorePermanent current=#\(now)")
     }
 
-    /// 执行一次切换并读回校验（F5.2 / F5.3），记录日志（F11.2），失败时提示并保持切换前的状态（F11.1）。
+    /// Switches, reads the mode back to verify, logs the result, and on failure shows an alert and keeps the previous state.
     @discardableResult
     private func perform(_ target: Mode, on display: CGDirectDisplayID, uuid: String, from previous: Mode?,
                          option: CGConfigureOption, label: String, reportErrors: Bool = true) -> Bool {
@@ -304,7 +304,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             if readback != target.number {
                 log.error("\(label, privacy: .public) readback mismatch uuid=\(uuid, privacy: .public) want=#\(target.number) got=#\(readback)")
                 err = .failure
-                // 尽量回到切换前的状态
+                // Try to get back to the state before the switch
                 if let previous, readback != previous.number {
                     _ = PrivateDisplay.apply(previous.number, on: display, option: .permanently)
                 }
@@ -321,7 +321,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         return false
     }
 
-    /// F6.8：等待确认期间目标显示器被拔掉，静默结束等待。
+    /// The display was removed while waiting for confirmation: end the wait silently.
     fileprivate func displayRemoved(_ display: CGDirectDisplayID) {
         guard let p = pending, p.display == display else { return }
         pending = nil
@@ -330,7 +330,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         log.info("pending cancelled: display removed uuid=\(p.uuid, privacy: .public)")
     }
 
-    // MARK: - 其他菜单动作
+    // MARK: - Other menu actions
 
     @objc private func toggleLaunchAtLogin(_ sender: NSMenuItem) {
         let service = SMAppService.mainApp
@@ -339,7 +339,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                 try service.unregister()
             } else {
                 try service.register()
-                // 系统可能要求用户在“系统设置 › 通用 › 登录项”里批准，否则菜单不会打勾，再点也没反应
+                // macOS may require approval in System Settings › General › Login Items; without it the item stays unchecked and clicking again does nothing
                 if service.status == .requiresApproval {
                     showAlert(L10n.loginItemFailedTitle, L10n.loginItemNeedsApproval)
                     SMAppService.openSystemSettingsLoginItems()
@@ -352,13 +352,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     @objc private func quit(_ sender: Any?) { NSApp.terminate(nil) }
 
-    // MARK: - 检查更新（F14）
+    // MARK: - Check for Updates
 
     @objc private func checkForUpdates(_ sender: Any?) {
         updateChecker.check { [weak self] outcome in self?.presentUpdate(outcome) }
     }
 
-    /// F14.3：按结果构造提示框；第一个按钮为默认按钮。内部可见：测试构建用它截图。
+    /// Builds the alert for a result; the first button is the default. Internal so the test build can snapshot it.
     func makeUpdateAlert(_ outcome: UpdateLogic.Outcome, current: String = UpdateChecker.bundleVersion) -> NSAlert {
         let alert = NSAlert()
         switch outcome {
@@ -399,7 +399,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 }
 
-/// C 回调，不能捕获上下文。只关心移除事件（F10.2）。
+/// C callback, so it can't capture context. Only display removal matters; our own switches also trigger it.
 func reconfigurationCallback(_ display: CGDirectDisplayID, _ flags: CGDisplayChangeSummaryFlags,
                                      _ userInfo: UnsafeMutableRawPointer?) {
     guard flags.contains(.removeFlag), let userInfo else { return }

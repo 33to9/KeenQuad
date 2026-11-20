@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Copyright © 2026 33to9
 #if KEENQUAD_TEST
-// 仅测试构建（KEENQUAD_TEST=1 ./build.sh）包含此文件，产品包里没有。
-// 通过分布式通知驱动真实的 NSMenu 项和面板按键，把状态写到 $TMPDIR/keenquad-test.txt。
+// Compiled only into the test build (KEENQUAD_TEST=1 ./build.sh), never into the product.
+// Drives the real NSMenu items and panel keys through a distributed notification and writes results to $TMPDIR/keenquad-test.txt.
 import AppKit
 import ServiceManagement
 
@@ -103,10 +103,10 @@ final class TestHook: NSObject {
             write("icon size=\(img.size) template=\(img.isTemplate) reps=\(reps) visible=\(d.statusItem.isVisible) windowFrame=\(NSStringFromRect(f)) screenTop=\(NSScreen.main?.frame.maxY ?? 0)")
             snap(b, "icon")
         case "snap": if let p = panel, let v = p.contentView { snap(v, "panel") } else { write("snap: no panel") }
-        case "remove":   // 走真实的 C 回调路径模拟目标显示器被移除（F6.8）
+        case "remove":   // simulate the display being removed through the real C callback
             reconfigurationCallback(CGMainDisplayID(), .removeFlag, Unmanaged.passUnretained(d).toOpaque())
             write("remove callback sent")
-        case "setmode":  // 本工具自己切换模式也会触发回调，只应忽略（F10.2）
+        case "setmode":  // our own switches trigger the callback too and must be ignored
             reconfigurationCallback(CGMainDisplayID(), .setModeFlag, Unmanaged.passUnretained(d).toOpaque())
             write("setmode callback sent")
         case "loginstatus":
@@ -115,7 +115,7 @@ final class TestHook: NSObject {
             do { try SMAppService.mainApp.register(); write("register ok status=\(SMAppService.mainApp.status.rawValue)") }
             catch { write("register error: \(error) status=\(SMAppService.mainApp.status.rawValue)") }
         case let c where c.hasPrefix("update"):
-            // update[:<假装的当前版本>[:<仓库>]] —— 真实网络请求；检查期间导出菜单；结果写出提示框文字并截图，不弹模态框
+            // update[:<pretend installed version>[:<repo>]]: real network request; dumps the menu while checking, then writes the alert text and a snapshot without showing it modally
             let parts = c.split(separator: ":", omittingEmptySubsequences: false).map(String.init)
             let current = parts.count > 1 && !parts[1].isEmpty ? parts[1] : UpdateChecker.bundleVersion
             let repo = parts.count > 2 ? parts[2] : UpdateChecker.bundleRepository

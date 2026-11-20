@@ -2,7 +2,7 @@
 // Copyright © 2026 33to9
 import Foundation
 
-/// 模式表中的一条记录（附录 B）。纯数据，不触碰任何系统接口，可单独测试。
+/// One entry of the display mode table. Pure data with no system calls, so it can be tested on its own.
 struct Mode: Equatable {
     let number: Int32
     let width: Int
@@ -19,19 +19,19 @@ struct Mode: Equatable {
     var isHiDPI: Bool { density == 2.0 }
     var aspect: Double { height == 0 ? 0 : Double(width) / Double(height) }
 
-    /// 模式签名：`宽x高@密度x@刷新率`，例如 `1600x1000@2x@60`（术语表）。
+    /// Mode signature `WIDTHxHEIGHT@DENSITYx@HZ`, for example `1600x1000@2x@60`.
     var signature: String {
         let d = density.rounded() == density ? String(Int(density)) : String(format: "%.2g", density)
         return "\(width)x\(height)@\(d)x@\(hz)"
     }
 }
 
-/// 一个候选档位及其在菜单中的呈现信息。
+/// A candidate mode and how it's shown in the menu.
 struct Candidate: Equatable {
     let mode: Mode
     let isCurrent: Bool
     let isPointToPoint: Bool
-    /// 与当前刷新率不同时需要在文字后追加的刷新率（F4.5），相同时为 nil。
+    /// Refresh rate to append when it differs from the current one; nil when it's the same.
     let extraHz: Int?
 }
 
@@ -39,12 +39,12 @@ struct DisplayCandidates: Equatable {
     let current: Mode?
     let main: [Candidate]
     let others: [Candidate]
-    /// 当前模式是发虚的 1 倍版本时，同尺寸的 HiDPI 候选（F12.1）；否则为 nil。
+    /// When the current mode is a blurry 1x one, the HiDPI candidate of the same size; otherwise nil.
     let sharpVersion: Candidate?
 }
 
 enum CandidateRules {
-    /// F3 的全部规则。
+    /// All candidate rules: HiDPI and usable for the desktop, one per size, split by the panel's aspect ratio.
     static func compute(table: [Mode], currentNumber: Int32) -> DisplayCandidates {
         let current = table.first { $0.number == currentNumber }
 
@@ -92,7 +92,7 @@ enum CandidateRules {
                 others.append(candidate(m))
             }
         }
-        // F12.1：当前是非原生的 1 倍模式，且候选里有同尺寸的档位
+        // The current mode is 1x, not the panel's native mode, and a candidate has the same size
         var sharp: Candidate?
         if let cur = current, cur.density == 1.0, !cur.isNative {
             sharp = (main + others).first { $0.mode.width == cur.width && $0.mode.height == cur.height }
@@ -100,12 +100,12 @@ enum CandidateRules {
         return DisplayCandidates(current: current, main: main, others: others, sharpVersion: sharp)
     }
 
-    /// 在当次枚举的候选中按签名找模式（F5.4、6.6）。
+    /// Finds a mode by signature among this enumeration's candidates.
     static func find(signature: String, in c: DisplayCandidates) -> Mode? {
         (c.main + c.others).first { $0.mode.signature == signature }?.mode
     }
 
-    /// 还原时在当次模式表中定位之前的模式：优先号码与签名都一致的，否则按签名找可用于桌面的那条。
+    /// Locates the previous mode for a revert: same number and signature first, else a desktop-usable mode with that signature.
     static func locate(signature: String, preferredNumber: Int32, in table: [Mode]) -> Mode? {
         table.first { $0.number == preferredNumber && $0.signature == signature }
             ?? table.first { $0.signature == signature && $0.flags & Mode.flagNotForDesktop == 0 }
@@ -113,7 +113,7 @@ enum CandidateRules {
     }
 }
 
-/// 菜单的文字模型，与 AppKit 无关，便于测试（F4）。
+/// The menu's text model, independent of AppKit so it can be tested.
 enum MenuText {
     static func itemTitle(_ c: Candidate) -> (main: String, tag: String?) {
         var main = L10n.size(c.mode.width, c.mode.height)
@@ -128,7 +128,7 @@ enum MenuText {
         return L10n.header(name: name, w: fallbackSize.0, h: fallbackSize.1, hiDPI: false)
     }
 
-    /// 纯文本形式的显示器段落，供自测比对 F4.1。
+    /// A display's menu section as plain text, for the self-test.
     static func render(name: String, candidates: DisplayCandidates, fallbackSize: (Int, Int) = (0, 0)) -> [String] {
         var lines = [header(name: name, current: candidates.current, fallbackSize: fallbackSize)]
         func line(_ c: Candidate, indent: String) -> String {

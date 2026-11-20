@@ -2,7 +2,7 @@
 // Copyright © 2026 33to9
 import AppKit
 
-/// 防黑屏确认面板（F6）。非模态小面板 + 加入 `.common` 模式的定时器，超时无人操作也能自动还原。
+/// "Keep this resolution?" panel. A small non-modal panel plus a timer in the `.common` run-loop mode, so it reverts even if nobody is there.
 final class ConfirmPanel: NSObject, NSWindowDelegate {
     enum Outcome { case keep, revert }
 
@@ -39,8 +39,8 @@ final class ConfirmPanel: NSObject, NSWindowDelegate {
         titleLabel.isSelectable = false
         titleLabel.font = .boldSystemFont(ofSize: NSFont.systemFontSize + 1)
 
-        // F6.2 修订：说明这一档按多大像素渲染
-        // 译文长短不一（F13）：正文按固定宽度自动换行，面板高度随内容
+        // Says how many pixels this mode renders
+        // Translations vary in length: body text wraps at a fixed width and the panel grows to fit
         let textWidth = ConfirmPanel.width - 82 - 20
         let renderLabel = NSTextField(wrappingLabelWithString: L10n.confirmRender(w: renderSize.0, h: renderSize.1))
         renderLabel.preferredMaxLayoutWidth = textWidth
@@ -54,7 +54,7 @@ final class ConfirmPanel: NSObject, NSWindowDelegate {
         bodyLabel.textColor = .secondaryLabelColor
 
         let keepButton = NSButton(title: L10n.keep, target: nil, action: nil)
-        keepButton.keyEquivalent = "\r"          // 默认按钮
+        keepButton.keyEquivalent = "\r"          // default button
         keepButton.bezelStyle = .rounded
         let revertButton = NSButton(title: L10n.revert, target: nil, action: nil)
         revertButton.keyEquivalent = "\u{1b}"     // Esc
@@ -105,26 +105,26 @@ final class ConfirmPanel: NSObject, NSWindowDelegate {
         panel.contentView = content
         panel.defaultButtonCell = keepButton.cell as? NSButtonCell
         updateBody()
-        // 按最长倒计时文案确定高度，之后每秒更新时面板不跳动
+        // Size the panel for the longest countdown text so it doesn't jump every second
         content.layoutSubtreeIfNeeded()
         panel.setContentSize(NSSize(width: ConfirmPanel.width, height: max(150, content.fittingSize.height)))
     }
 
     func show() {
         center()
-        NSApp.activate(ignoringOtherApps: true)   // 6.6：无 Dock 图标的应用需要主动取得键盘焦点
-        // macOS 14 起激活是协作式的，可能被系统忽略；非激活面板不依赖应用处于前台也能成为键窗口，
-        // 保证回车和 Esc 一定送到这里。
+        NSApp.activate(ignoringOtherApps: true)   // an app without a Dock icon has to take keyboard focus itself
+        // Since macOS 14 activation is cooperative and may be ignored; a non-activating panel can become key
+        // without the app being frontmost, so Return and Esc always reach it.
         panel.makeKeyAndOrderFront(nil)
         panel.orderFrontRegardless()
         panel.makeKey()
 
         let t = Timer(timeInterval: 1, repeats: true) { [weak self] _ in self?.tick() }
-        RunLoop.main.add(t, forMode: .common)   // 6.6：菜单跟踪 / 模态期间也要触发
+        RunLoop.main.add(t, forMode: .common)   // keep firing during menu tracking and modal sessions
         timer = t
     }
 
-    /// 切换后屏幕尺寸会变，按目标显示器的新位置居中（F6.3）。
+    /// The screen size changes after switching, so center on the display's new bounds.
     func center() {
         let b = CGDisplayBounds(display)
         guard b.width > 0 else { panel.center(); return }
@@ -134,7 +134,7 @@ final class ConfirmPanel: NSObject, NSWindowDelegate {
         panel.setFrameOrigin(NSPoint(x: screenRect.midX - size.width / 2, y: screenRect.midY - size.height / 2))
     }
 
-    /// 静默结束（F6.8），不回调。
+    /// Ends without calling back (the display was removed).
     func dismissSilently() {
         onFinish = nil
         close()
@@ -157,7 +157,7 @@ final class ConfirmPanel: NSObject, NSWindowDelegate {
     private func tick() {
         remaining -= 1
         if remaining <= 0 {
-            finish(.revert)   // F6.9：无人操作时自动还原
+            finish(.revert)   // revert when nobody responds
         } else {
             updateBody()
         }

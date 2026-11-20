@@ -2,13 +2,13 @@
 // Copyright © 2026 33to9
 import Foundation
 
-// MARK: - 语言（F13）
+// MARK: - Languages
 
-/// 支持的界面语言。原始值是语言代码，顺序即语言子菜单中的顺序。
+/// Supported UI languages. The raw value is the language code; the order is the Language submenu's order.
 enum AppLanguage: String, CaseIterable {
     case en, zhHans = "zh-Hans", zhHant = "zh-Hant", ja, de, ko, fr, es
 
-    /// 在语言子菜单中显示的名称，固定用该语言自己的文字。
+    /// The name shown in the Language submenu, always in the language's own script.
     var nativeName: String {
         switch self {
         case .en: return "English"
@@ -22,7 +22,7 @@ enum AppLanguage: String, CaseIterable {
         }
     }
 
-    /// 把系统语言代码（如 `zh-Hant-TW`、`en-GB`、`es-419`）归并到支持的语言；不支持时为 nil。
+    /// Maps a system language code (such as `zh-Hant-TW`, `en-GB`, `es-419`) to a supported language; nil if unsupported.
     static func from(systemCode code: String) -> AppLanguage? {
         let parts = code.replacingOccurrences(of: "_", with: "-").lowercased().split(separator: "-").map(String.init)
         guard let lang = parts.first else { return nil }
@@ -36,19 +36,19 @@ enum AppLanguage: String, CaseIterable {
         return AppLanguage(rawValue: lang)
     }
 
-    /// 按首选语言列表从前往后找第一个支持的语言，都不支持时用英语。
+    /// The first supported entry of the preferred languages, or English.
     static func resolve(preferred: [String]) -> AppLanguage {
         preferred.lazy.compactMap { from(systemCode: $0) }.first ?? .en
     }
 }
 
-/// 当前语言：用户指定的优先，否则跟随系统（F13.4，第 3 节）。每次读取时计算，不缓存。
+/// The current language: the user's choice, else the system's. Computed on every read, never cached.
 enum LanguageSetting {
     static let defaultsKey = "language"
-    /// 仅供自测强制指定语言。
+    /// Forces a language; for the self-test only.
     static var forced: AppLanguage?
 
-    /// 用户在菜单里指定的语言；nil 表示跟随系统。
+    /// The language chosen in the menu; nil means follow the system.
     static var choice: AppLanguage? {
         get { UserDefaults.standard.string(forKey: defaultsKey).flatMap(AppLanguage.init(rawValue:)) }
         set {
@@ -62,32 +62,32 @@ enum LanguageSetting {
     }
 }
 
-// MARK: - 文案表（F4.9）
+// MARK: - String tables
 
-/// 一种语言的全部界面文案。每条都是必填属性，漏写无法编译。
+/// All UI text for one language. Every string is a required property, so a missing one doesn't compile.
 struct StringTable {
-    /// 标题行、“点对点”等标注前的间隔
+    /// Separator before the header's "Current" part and labels such as pixel-perfect
     let gap: String
     let displayFallbackName: (Int) -> String
-    /// 标题行中“当前 <尺寸>”部分，参数是已格式化的尺寸
+    /// The "Current <size>" part of the header; the argument is the formatted size
     let current: (String) -> String
     let notHiDPI: String
     let pointToPoint: String
     let otherAspects: String
     let noDisplays: String
     let noHiDPIModes: String
-    /// F12 修复项，参数是已格式化的尺寸
+    /// The Switch to Sharp item; the argument is the formatted size
     let sharpVersion: (String) -> String
-    /// F12 悬停提示：当前尺寸、清晰版渲染尺寸
+    /// Its tooltip: the current size and the sharp version's rendered size
     let sharpVersionTip: (String, String) -> String
     let launchAtLogin: String
     let language: String
     let followSystem: String
     let quit: String
     let confirmTitle: String
-    /// 渲染尺寸
+    /// Rendered size
     let confirmRender: (String) -> String
-    /// 秒数、之前的尺寸
+    /// Seconds left, previous size
     let confirmBody: (Int, String) -> String
     let keep: String
     let revert: String
@@ -97,12 +97,12 @@ struct StringTable {
     let loginItemFailedBody: (String) -> String
     let loginItemNeedsApproval: String
     let ok: String
-    // 检查更新（F14）
+    // Check for Updates
     let checkForUpdates: String
     let checkingForUpdates: String
-    /// 新版本号
+    /// The new version
     let updateAvailableTitle: (String) -> String
-    /// 当前版本号
+    /// The installed version
     let currentVersion: (String) -> String
     let download: String
     let later: String
@@ -450,7 +450,7 @@ extension StringTable {
         badVersion: { "Versión “\($0)” no reconocida." })
 }
 
-// MARK: - 取文案的接口（调用处不变，内部按当前语言查表）
+// MARK: - Accessors (look up the current language's table)
 
 enum L10n {
     private static var t: StringTable { StringTable.table(for: LanguageSetting.current) }
@@ -467,7 +467,7 @@ enum L10n {
     static var noDisplays: String { t.noDisplays }
     static var noHiDPIModes: String { t.noHiDPIModes }
 
-    // 清晰版修复项（F12）
+    // Switch to Sharp
     static func sharpVersion(_ w: Int, _ h: Int) -> String { t.sharpVersion(size(w, h)) }
     static func sharpVersionTip(_ w: Int, _ h: Int) -> String { t.sharpVersionTip(size(w, h), size(w * 2, h * 2)) }
 
@@ -477,14 +477,14 @@ enum L10n {
     static func version(_ v: String) -> String { "KeenQuad \(v)" }
     static var quit: String { t.quit }
 
-    // 确认面板（F6.2）
+    // Confirmation panel
     static var confirmTitle: String { t.confirmTitle }
     static func confirmRender(w: Int, h: Int) -> String { t.confirmRender(size(w, h)) }
     static func confirmBody(seconds: Int, w: Int, h: Int) -> String { t.confirmBody(seconds, size(w, h)) }
     static var keep: String { t.keep }
     static var revert: String { t.revert }
 
-    // 错误提示（F11.1 / F8.2）
+    // Errors
     static var switchFailedTitle: String { t.switchFailedTitle }
     static func switchFailedBody(_ code: Int32) -> String { t.switchFailedBody(code) }
     static var loginItemFailedTitle: String { t.loginItemFailedTitle }
@@ -492,7 +492,7 @@ enum L10n {
     static var loginItemNeedsApproval: String { t.loginItemNeedsApproval }
     static var ok: String { t.ok }
 
-    // 检查更新（F14）
+    // Check for Updates
     static var checkForUpdates: String { t.checkForUpdates }
     static var checkingForUpdates: String { t.checkingForUpdates }
     static func updateAvailableTitle(_ v: String) -> String { t.updateAvailableTitle(v) }
