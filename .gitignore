@@ -1,0 +1,9 @@
+# macOS / exFAT 伴生文件
+._*
+.DS_Store
+# 不公开的内容
+KeenQuad-Brand-Kit/
+task-proof/
+KeenQuad_v1_0.md
+# 构建产物通过 GitHub Releases 发布
+dist/

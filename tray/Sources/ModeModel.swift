@@ -1,0 +1,150 @@
+import Foundation
+
+/// 模式表中的一条记录（附录 B）。纯数据，不触碰任何系统接口，可单独测试。
+struct Mode: Equatable {
+    let number: Int32
+    let width: Int
+    let height: Int
+    let hz: Int
+    let density: Double
+    let flags: UInt32
+    let depth: Int
+
+    static let flagNative: UInt32 = 0x0200_0000
+    static let flagNotForDesktop: UInt32 = 0x4000_0000
+
+    var isNative: Bool { flags & Mode.flagNative != 0 }
+    var isHiDPI: Bool { density == 2.0 }
+    var aspect: Double { height == 0 ? 0 : Double(width) / Double(height) }
+
+    /// 模式签名：`宽x高@密度x@刷新率`，例如 `1600x1000@2x@60`（术语表）。
+    var signature: String {
+        let d = density.rounded() == density ? String(Int(density)) : String(format: "%.2g", density)
+        return "\(width)x\(height)@\(d)x@\(hz)"
+    }
+}
+
+/// 一个候选档位及其在菜单中的呈现信息。
+struct Candidate: Equatable {
+    let mode: Mode
+    let isCurrent: Bool
+    let isPointToPoint: Bool
+    /// 与当前刷新率不同时需要在文字后追加的刷新率（F4.5），相同时为 nil。
+    let extraHz: Int?
+}
+
+struct DisplayCandidates: Equatable {
+    let current: Mode?
+    let main: [Candidate]
+    let others: [Candidate]
+    /// 当前模式是发虚的 1 倍版本时，同尺寸的 HiDPI 候选（F12.1）；否则为 nil。
+    let sharpVersion: Candidate?
+}
+
+enum CandidateRules {
+    /// F3 的全部规则。
+    static func compute(table: [Mode], currentNumber: Int32) -> DisplayCandidates {
+        let current = table.first { $0.number == currentNumber }
+
+        // F3.1
+        let hidpi = table.filter { $0.density == 2.0 && $0.flags & Mode.flagNotForDesktop == 0 }
+
+        // F3.2
+        let curHz = current?.hz
+        var groups: [String: [Mode]] = [:]
+        var order: [String] = []
+        for m in hidpi {
+            let key = "\(m.width)x\(m.height)"
+            if groups[key] == nil { order.append(key) }
+            groups[key, default: []].append(m)
+        }
+        let picked: [Mode] = order.compactMap { key in
+            guard let group = groups[key], let bestDepth = group.map(\.depth).max() else { return nil }
+            let deep = group.filter { $0.depth == bestDepth }
+            if let hz = curHz, let same = deep.first(where: { $0.hz == hz }) { return same }
+            return deep.max { $0.hz < $1.hz }
+        }.sorted { ($0.width, $0.height) < ($1.width, $1.height) }
+
+        // F3.3
+        let panel = table.first { $0.isNative && $0.density == 1.0 }
+            ?? table.first { $0.isNative }
+            ?? current
+        let panelAspect = panel?.aspect
+
+        func candidate(_ m: Mode) -> Candidate {
+            Candidate(mode: m,
+                      isCurrent: m.number == currentNumber,
+                      isPointToPoint: m.isNative,
+                      extraHz: (curHz != nil && m.hz != curHz) ? m.hz : nil)
+        }
+
+        // F3.4
+        var main: [Candidate] = []
+        var others: [Candidate] = []
+        for m in picked {
+            if let pa = panelAspect, abs(m.aspect - pa) <= 0.01 {
+                main.append(candidate(m))
+            } else if panelAspect == nil {
+                main.append(candidate(m))
+            } else {
+                others.append(candidate(m))
+            }
+        }
+        // F12.1：当前是非原生的 1 倍模式，且候选里有同尺寸的档位
+        var sharp: Candidate?
+        if let cur = current, cur.density == 1.0, !cur.isNative {
+            sharp = (main + others).first { $0.mode.width == cur.width && $0.mode.height == cur.height }
+        }
+        return DisplayCandidates(current: current, main: main, others: others, sharpVersion: sharp)
+    }
+
+    /// 在当次枚举的候选中按签名找模式（F5.4、6.6）。
+    static func find(signature: String, in c: DisplayCandidates) -> Mode? {
+        (c.main + c.others).first { $0.mode.signature == signature }?.mode
+    }
+
+    /// 还原时在当次模式表中定位之前的模式：优先号码与签名都一致的，否则按签名找可用于桌面的那条。
+    static func locate(signature: String, preferredNumber: Int32, in table: [Mode]) -> Mode? {
+        table.first { $0.number == preferredNumber && $0.signature == signature }
+            ?? table.first { $0.signature == signature && $0.flags & Mode.flagNotForDesktop == 0 }
+            ?? table.first { $0.signature == signature }
+    }
+}
+
+/// 菜单的文字模型，与 AppKit 无关，便于测试（F4）。
+enum MenuText {
+    static func itemTitle(_ c: Candidate) -> (main: String, tag: String?) {
+        var main = L10n.size(c.mode.width, c.mode.height)
+        if let hz = c.extraHz { main += L10n.gap + L10n.refreshRate(hz) }
+        return (main, c.isPointToPoint ? L10n.pointToPoint : nil)
+    }
+
+    static func header(name: String, current: Mode?, fallbackSize: (Int, Int)) -> String {
+        if let cur = current {
+            return L10n.header(name: name, w: cur.width, h: cur.height, hiDPI: cur.isHiDPI)
+        }
+        return L10n.header(name: name, w: fallbackSize.0, h: fallbackSize.1, hiDPI: false)
+    }
+
+    /// 纯文本形式的显示器段落，供自测比对 F4.1。
+    static func render(name: String, candidates: DisplayCandidates, fallbackSize: (Int, Int) = (0, 0)) -> [String] {
+        var lines = [header(name: name, current: candidates.current, fallbackSize: fallbackSize)]
+        func line(_ c: Candidate, indent: String) -> String {
+            let t = itemTitle(c)
+            return indent + (c.isCurrent ? "✓ " : "  ") + t.main + (t.tag.map { L10n.gap + $0 } ?? "")
+        }
+        if candidates.main.isEmpty && candidates.others.isEmpty {
+            lines.append("  " + L10n.noHiDPIModes)
+            return lines
+        }
+        if let s = candidates.sharpVersion {   // F12.2
+            lines.append("  " + L10n.sharpVersion(s.mode.width, s.mode.height))
+        }
+        for c in candidates.main { lines.append(line(c, indent: "")) }
+        if !candidates.others.isEmpty {
+            lines.append("  " + L10n.otherAspects + " ▸")
+            for c in candidates.others { lines.append(line(c, indent: "      ")) }
+        }
+        return lines
+    }
+}
