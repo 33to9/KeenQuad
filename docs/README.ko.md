@@ -58,7 +58,7 @@ curl -fsSL https://raw.githubusercontent.com/33to9/KeenQuad/main/install.sh | ba
 
 ### 방법 2: DMG
 
-[Releases](https://github.com/33to9/KeenQuad/releases/latest)에서 최신 `KeenQuad_vX.Y.Z.dmg`를 다운로드해 열고 KeenQuad를 ‘응용 프로그램’ 폴더로 드래그하십시오.
+**[KeenQuad.dmg 다운로드](https://github.com/33to9/KeenQuad/releases/latest/download/KeenQuad.dmg)**(항상 최신 버전)한 뒤 열고 KeenQuad를 ‘응용 프로그램’ 폴더로 드래그하십시오. 이전 버전은 [Releases](https://github.com/33to9/KeenQuad/releases)에 있습니다.
 
 이 앱은 Apple의 공증을 받지 않았기 때문에 macOS가 처음 실행을 한 번 막습니다.
 - **macOS 15 이상**: 이중 클릭(경고가 나타남)한 다음 **시스템 설정 → 개인정보 보호 및 보안**을 열고, 아래로 스크롤하여 **그래도 열기**를 클릭

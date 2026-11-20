@@ -61,7 +61,7 @@ KEENQUAD_TEST=1 ./build.sh       # ~/Library/Caches/KeenQuad-build-test/KeenQuad
 1. Bump `CFBundleShortVersionString` and `CFBundleVersion` in `Info.plist`.
 2. `./build.sh --install --package`
 3. Commit and push.
-4. `gh release create vX.Y.Z ../dist/KeenQuad_vX.Y.Z.dmg ../dist/KeenQuad_vX.Y.Z_macOS.zip`, with notes in two parts: "What's new in X.Y.Z" and "Install" (one-line installer, then DMG with the Gatekeeper steps). The DMG is for people downloading by hand; `install.sh` uses the ZIP.
+4. `gh release create vX.Y.Z ../dist/KeenQuad_vX.Y.Z.dmg ../dist/KeenQuad.dmg ../dist/KeenQuad_vX.Y.Z_macOS.zip`, with notes in two parts: "What's new in X.Y.Z" and "Install" (one-line installer, then DMG with the Gatekeeper steps). The DMGs are for people downloading by hand: `KeenQuad.dmg` is the same image under a fixed name, which the README links to as `releases/latest/download/KeenQuad.dmg`. `install.sh` uses the ZIP.
 
 Installed copies find the release through **Check for Updates…**, which reads the latest non-draft, non-prerelease release of the repository named in `Info.plist` under `KQUpdateRepository`. `../install.sh` installs the release's `_macOS.zip` after checking the SHA-256 that GitHub publishes for it.
 

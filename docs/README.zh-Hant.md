@@ -58,7 +58,7 @@ curl -fsSL https://raw.githubusercontent.com/33to9/KeenQuad/main/install.sh | ba
 
 ### 方式 2：DMG
 
-從 [Releases](https://github.com/33to9/KeenQuad/releases/latest) 下載最新的 `KeenQuad_vX.Y.Z.dmg`，打開後把 KeenQuad 拖到「應用程式」檔案夾上。
+**[下載 KeenQuad.dmg](https://github.com/33to9/KeenQuad/releases/latest/download/KeenQuad.dmg)**（始終是最新版本），打開後把 KeenQuad 拖到「應用程式」檔案夾上。舊版本見 [Releases](https://github.com/33to9/KeenQuad/releases)。
 
 這個 App 沒有經過 Apple 公證，macOS 會阻擋一次第一次打開：
 - **macOS 15 及以上版本**：按兩下（會出現警告），然後打開 **系統設定 → 隱私權與安全性**，向下捲動，點 **強制打開**

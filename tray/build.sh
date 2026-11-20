@@ -4,7 +4,7 @@
 # Builds KeenQuad.app in one command. Building and signing happen on the internal disk.
 # Usage: ./build.sh            build ~/Library/Caches/KeenQuad-build/KeenQuad.app
 #        ./build.sh --install  also update /Applications/KeenQuad.app in place
-#        ./build.sh --package  also create ../dist/KeenQuad_v<version>.dmg (drag-to-Applications installer)
+#        ./build.sh --package  also create ../dist/KeenQuad_v<version>.dmg and KeenQuad.dmg (drag-to-Applications installer)
 #                              and ../dist/KeenQuad_v<version>_macOS.zip (used by install.sh) for GitHub Releases
 #        The two options can be combined.
 set -eu
@@ -70,6 +70,9 @@ if [ "$PACKAGE" = "1" ]; then
   sh "$SRC/make-dmg.sh" "$APP" "$DMG"
   cat "$DMG" > "$SRC/../dist/KeenQuad_v${VERSION}.dmg"
   echo "Packaged: $SRC/../dist/KeenQuad_v${VERSION}.dmg"
+  # Same image under a fixed name, so releases/latest/download/KeenQuad.dmg always gets the latest version
+  cat "$DMG" > "$SRC/../dist/KeenQuad.dmg"
+  echo "Packaged: $SRC/../dist/KeenQuad.dmg"
   shasum -a 256 "$ZIP" "$DMG"
 fi
 

@@ -58,7 +58,7 @@ Das Skript lädt die neueste Version von GitHub, prüft die SHA-256-Prüfsumme, 
 
 ### Option 2: DMG
 
-Lade die neueste `KeenQuad_vX.Y.Z.dmg` unter [Releases](https://github.com/33to9/KeenQuad/releases/latest), öffne sie und ziehe KeenQuad auf den Ordner „Programme“.
+**[KeenQuad.dmg herunterladen](https://github.com/33to9/KeenQuad/releases/latest/download/KeenQuad.dmg)** (immer die neueste Version), öffne sie und ziehe KeenQuad auf den Ordner „Programme“. Ältere Versionen findest du unter [Releases](https://github.com/33to9/KeenQuad/releases).
 
 Die App ist nicht von Apple notariell beglaubigt, daher blockiert macOS den ersten Start einmal:
 - **macOS 15 und neuer**: Doppelklicken (eine Warnung erscheint), dann **Systemeinstellungen → Datenschutz & Sicherheit** öffnen, nach unten scrollen und auf **Dennoch öffnen** klicken

@@ -58,7 +58,7 @@ The script downloads the latest release from GitHub, verifies its SHA-256, insta
 
 ### Option 2: DMG
 
-Download the latest `KeenQuad_vX.Y.Z.dmg` from [Releases](../../releases/latest), open it and drag KeenQuad onto the Applications folder.
+**[Download KeenQuad.dmg](https://github.com/33to9/KeenQuad/releases/latest/download/KeenQuad.dmg)** (always the latest version), open it and drag KeenQuad onto the Applications folder. Older versions are on [Releases](../../releases).
 
 The app is not notarized by Apple, so macOS blocks the first launch once:
 - **macOS 15 and later**: double-click (a warning appears), then open **System Settings → Privacy & Security**, scroll down and click **Open Anyway**
