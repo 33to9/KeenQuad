@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-only
-// Copyright © 2026 33to9
+// Copyright © 2026 Pivotfrag LLC
 import AppKit
 
 /// "Keep this resolution?" panel. A small non-modal panel plus a timer in the `.common` run-loop mode, so it reverts even if nobody is there.

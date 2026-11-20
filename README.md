@@ -78,13 +78,13 @@ None. Switching display modes doesn't need Screen Recording, Accessibility or an
 
 ## Privacy
 
-KeenQuad collects nothing and has no telemetry. It connects to the internet only when you click **Check for Updates…**: one request to the GitHub API for the latest release, carrying no information about you. Your settings stay in `~/Library/Preferences/com.keenquad.app.plist`.
+KeenQuad collects nothing and has no telemetry. It connects to the internet only when you click **Check for Updates…**: one request to the GitHub API for the latest release, carrying no information about you. Your settings stay in `~/Library/Preferences/com.pivotfrag.keenquad.plist`.
 
 ## Uninstall
 
 1. In KeenQuad's menu, turn off **Launch at Login**, then choose **Quit KeenQuad**.
 2. Delete `/Applications/KeenQuad.app`.
-3. Optional: run `defaults delete com.keenquad.app`.
+3. Optional: run `defaults delete com.pivotfrag.keenquad`.
 
 The resolution you're using stays; change it in System Settings if you like.
 
@@ -111,4 +111,4 @@ cd KeenQuad/tray
 
 This project is licensed under **GPL-3.0-only** (see [LICENSE](LICENSE)). The KeenQuad name and icons are not covered by the license; see [TRADEMARK.md](TRADEMARK.md).
 
-Copyright © 2026 [33to9](https://github.com/33to9)
+Copyright © 2026 [Pivotfrag LLC](https://pivotfrag.com)

@@ -1,6 +1,6 @@
 #!/bin/sh
 # SPDX-License-Identifier: GPL-3.0-only
-# Copyright © 2026 33to9
+# Copyright © 2026 Pivotfrag LLC
 # Builds KeenQuad.app in one command. Building and signing happen on the internal disk.
 # Usage: ./build.sh            build ~/Library/Caches/KeenQuad-build/KeenQuad.app
 #        ./build.sh --install  also update /Applications/KeenQuad.app in place
@@ -33,7 +33,7 @@ cat "$SRC/Resources/MenuIconTemplate@2x.png" > "$APP/Contents/Resources/MenuIcon
 printf 'APPL????' > "$APP/Contents/PkgInfo"
 # The test build gets its own bundle ID so it never touches the real app's login item or settings
 if [ "${KEENQUAD_TEST:-}" = "1" ]; then
-  plutil -replace CFBundleIdentifier -string com.keenquad.app.test "$APP/Contents/Info.plist"
+  plutil -replace CFBundleIdentifier -string com.pivotfrag.keenquad.test "$APP/Contents/Info.plist"
 fi
 
 swiftc -O -swift-version 5 -target arm64-apple-macos14.0 \
@@ -70,7 +70,7 @@ fi
 
 if [ "$INSTALL" = "1" ]; then
   if [ "${KEENQUAD_TEST:-}" = "1" ]; then echo "The test build can't be installed" >&2; exit 1; fi
-  if pgrep -x KeenQuad >/dev/null; then osascript -e 'quit app id "com.keenquad.app"' || true; sleep 1; fi
+  if pgrep -x KeenQuad >/dev/null; then osascript -e 'quit app id "com.pivotfrag.keenquad"' || true; sleep 1; fi
   # Update the bundle's contents in place: deleting the .app makes macOS drop its login item
   mkdir -p /Applications/KeenQuad.app
   rsync -a --delete "$APP/" /Applications/KeenQuad.app/

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-only
-// Copyright © 2026 33to9
+// Copyright © 2026 Pivotfrag LLC
 #if KEENQUAD_TEST
 // Compiled only into the test build (KEENQUAD_TEST=1 ./build.sh), never into the product.
 // Drives the real NSMenu items and panel keys through a distributed notification and writes results to $TMPDIR/keenquad-test.txt.
@@ -14,7 +14,7 @@ final class TestHook: NSObject {
     func install(_ d: AppDelegate) {
         delegate = d
         DistributedNotificationCenter.default().addObserver(self, selector: #selector(handle(_:)),
-                                                            name: .init("com.keenquad.test"), object: nil,
+                                                            name: .init("com.pivotfrag.keenquad.testhook"), object: nil,
                                                             suspensionBehavior: .deliverImmediately)
         write("ready")
     }

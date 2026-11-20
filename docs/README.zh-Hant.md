@@ -78,13 +78,13 @@ curl -fsSL https://raw.githubusercontent.com/33to9/KeenQuad/main/install.sh | ba
 
 ## 隱私權
 
-KeenQuad 不收集任何資料，沒有統計功能。只有在你點 **檢查更新…** 時才連網：向 GitHub API 發一次請求查詢最新版本，請求裡不帶任何關於你的資訊。設定儲存在 `~/Library/Preferences/com.keenquad.app.plist`。
+KeenQuad 不收集任何資料，沒有統計功能。只有在你點 **檢查更新…** 時才連網：向 GitHub API 發一次請求查詢最新版本，請求裡不帶任何關於你的資訊。設定儲存在 `~/Library/Preferences/com.pivotfrag.keenquad.plist`。
 
 ## 解除安裝
 
 1. 在 KeenQuad 的選單裡關閉 **登入時啟動**，然後選 **結束 KeenQuad**。
 2. 刪除 `/Applications/KeenQuad.app`。
-3. 可選：執行 `defaults delete com.keenquad.app`。
+3. 可選：執行 `defaults delete com.pivotfrag.keenquad`。
 
 目前使用的解析度會維持不變，需要的話可以在「系統設定」裡更改。
 
@@ -111,4 +111,4 @@ cd KeenQuad/tray
 
 本專案採用 **GPL-3.0-only** 授權（見 [LICENSE](../LICENSE)）。KeenQuad 名稱和圖像不在授權範圍內，見 [TRADEMARK.md](../TRADEMARK.md)。
 
-Copyright © 2026 [33to9](https://github.com/33to9)
+Copyright © 2026 [Pivotfrag LLC](https://pivotfrag.com)

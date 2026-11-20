@@ -48,8 +48,8 @@ To exercise the real menu and panel, build the test build:
 KEENQUAD_TEST=1 ./build.sh       # ~/Library/Caches/KeenQuad-build-test/KeenQuad.app
 ```
 
-- It uses its own bundle ID, `com.keenquad.app.test`, so it never touches the installed app's login item or settings. `build.sh` refuses to install or package it.
-- `Tests/TestHook.swift` listens for the distributed notification `com.keenquad.test`, whose object is a command (`menu`, `click:<title>`, `return`, `esc`, `state`, `snap`, `remove`, `update[:<version>[:<repo>]]`, …). Results go to `$TMPDIR/keenquad-test.txt`.
+- It uses its own bundle ID, `com.pivotfrag.keenquad.test`, so it never touches the installed app's login item or settings. `build.sh` refuses to install or package it.
+- `Tests/TestHook.swift` listens for the distributed notification `com.pivotfrag.keenquad.testhook`, whose object is a command (`menu`, `click:<title>`, `return`, `esc`, `state`, `snap`, `remove`, `update[:<version>[:<repo>]]`, …). Results go to `$TMPDIR/keenquad-test.txt`.
 - Switching resolution rearranges the windows on screen. Tell whoever is using the Mac before testing, prefer larger desktops, and switch back afterwards.
 - Delete the test build when you're done.
 
@@ -94,11 +94,13 @@ It's a non-activating panel at modal-panel level with a timer in the `.common` r
 
 ### Stored data
 
-Only `UserDefaults` in the `com.keenquad.app` domain: `confirmedModes` (display UUID → kept signatures) and `language`. No other files are written.
+Only `UserDefaults` in the `com.pivotfrag.keenquad` domain: `confirmedModes` (display UUID → kept signatures), `language` and `migratedLegacySettings`. On first launch, `main.swift` copies the first two from `com.keenquad.app`, the bundle ID that 0.4.0 used. No other files are written.
 
 ## Known limitations
 
 - Private functions may change in a future macOS. If the menu is empty or switching fails, run the self-test first to see whether the mode table is still readable.
 - KeenQuad only switches to modes macOS already has. It doesn't create resolutions or choose refresh rates.
+- The confirmation panel appears only on the display being switched. If that display goes black, press Esc or wait 15 seconds.
+- **Switch to Sharp** skips confirmation. When the HiDPI version has no mode at the current refresh rate, the refresh rate changes without the 15-second safety net.
 - Displays that are asleep aren't in `CGGetActiveDisplayList`, so they don't appear in the menu.
 - Some remote-desktop connections and display utilities make macOS re-detect displays on wake, which can reset the resolution to the default. Pick the resolution again from the menu.

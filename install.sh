@@ -1,6 +1,6 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-3.0-only
-# Copyright © 2026 33to9
+# Copyright © 2026 Pivotfrag LLC
 # KeenQuad installer
 #
 #   curl -fsSL https://raw.githubusercontent.com/33to9/KeenQuad/main/install.sh | bash
@@ -11,13 +11,15 @@
 # "Launch at Login" setting.
 #
 # Options (environment variables):
-#   KEENQUAD_VERSION=0.4.0   install a specific version instead of the latest
+#   KEENQUAD_VERSION=0.4.1   install a specific version instead of the latest
 #   KEENQUAD_NO_OPEN=1       don't launch the app after installing
 set -euo pipefail
 
 REPO="33to9/KeenQuad"
 APP_NAME="KeenQuad.app"
-BUNDLE_ID="com.keenquad.app"
+BUNDLE_ID="com.pivotfrag.keenquad"
+# 0.4.0 used this bundle ID; a running copy of it has to be quit too.
+LEGACY_BUNDLE_ID="com.keenquad.app"
 DEST="/Applications/${APP_NAME}"
 
 say()  { printf '\033[1;34m==>\033[0m %s\n' "$*"; }
@@ -40,8 +42,8 @@ main() {
         || fail "Could not reach GitHub (${api})."
 
     local tag url digest
-    tag=$(printf '%s' "$json" | grep -o '"tag_name": *"[^"]*"' | head -1 | sed 's/.*"\([^"]*\)"$/\1/')
-    url=$(printf '%s' "$json" | grep -o '"browser_download_url": *"[^"]*_macOS\.zip"' | head -1 | sed 's/.*"\(https[^"]*\)"$/\1/')
+    tag=$(printf '%s' "$json" | grep -o '"tag_name": *"[^"]*"' | head -1 | sed 's/.*"\([^"]*\)"$/\1/' || true)
+    url=$(printf '%s' "$json" | grep -o '"browser_download_url": *"[^"]*_macOS\.zip"' | head -1 | sed 's/.*"\(https[^"]*\)"$/\1/' || true)
     [ -n "$tag" ] && [ -n "$url" ] || fail "No macOS zip found in release ${tag:-?}."
     # GitHub publishes a sha256 digest per asset; it appears just before its download URL.
     digest=$(printf '%s' "$json" | tr ',' '\n' | grep -E '"digest"|"browser_download_url"' \
@@ -72,7 +74,10 @@ main() {
     # Quit a running copy so it can be replaced. Quitting reverts an unconfirmed resolution.
     if pgrep -xq KeenQuad; then
         say "Quitting the running KeenQuad…"
-        osascript -e "tell application id \"${BUNDLE_ID}\" to quit" >/dev/null 2>&1 || true
+        local id
+        for id in "$BUNDLE_ID" "$LEGACY_BUNDLE_ID"; do
+            osascript -e "if application id \"${id}\" is running then tell application id \"${id}\" to quit" >/dev/null 2>&1 || true
+        done
         local i
         for i in $(seq 1 20); do pgrep -xq KeenQuad || break; sleep 0.5; done
         pgrep -xq KeenQuad && fail "KeenQuad is still running. Quit it from its menu and try again."

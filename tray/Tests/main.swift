@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-only
-// Copyright © 2026 33to9
+// Copyright © 2026 Pivotfrag LLC
 // Read-only self-test: checks the rules against a reference mode table (an ARZOPA 2560 × 1600 panel),
 // then reads the connected displays' real tables and prints their menus. Switches nothing.
 // Run: ./Tests/run-selftest.sh

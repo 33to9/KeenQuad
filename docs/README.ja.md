@@ -78,13 +78,13 @@ KeenQuad のメニューで **アップデートを確認…** を選びます�
 
 ## プライバシー
 
-KeenQuad は何も収集せず、利用統計もありません。インターネットに接続するのは **アップデートを確認…** をクリックしたときだけで、最新リリースを調べるために GitHub API へ 1 回リクエストを送ります。あなたに関する情報は含みません。設定は `~/Library/Preferences/com.keenquad.app.plist` に保存されます。
+KeenQuad は何も収集せず、利用統計もありません。インターネットに接続するのは **アップデートを確認…** をクリックしたときだけで、最新リリースを調べるために GitHub API へ 1 回リクエストを送ります。あなたに関する情報は含みません。設定は `~/Library/Preferences/com.pivotfrag.keenquad.plist` に保存されます。
 
 ## アンインストール
 
 1. KeenQuad のメニューで **ログイン時に起動** をオフにし、**KeenQuad を終了** を選びます。
 2. `/Applications/KeenQuad.app` を削除します。
-3. 必要なら `defaults delete com.keenquad.app` を実行します。
+3. 必要なら `defaults delete com.pivotfrag.keenquad` を実行します。
 
 使用中の解像度はそのまま残ります。変更したい場合は「システム設定」で変更してください。
 
@@ -111,4 +111,4 @@ cd KeenQuad/tray
 
 このプロジェクトは **GPL-3.0-only** でライセンスされています（[LICENSE](../LICENSE) を参照）。KeenQuad の名称とアイコンはライセンスの対象外です。[TRADEMARK.md](../TRADEMARK.md) を参照してください。
 
-Copyright © 2026 [33to9](https://github.com/33to9)
+Copyright © 2026 [Pivotfrag LLC](https://pivotfrag.com)

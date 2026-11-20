@@ -78,13 +78,13 @@ Ninguno. Cambiar de modo de pantalla no requiere grabación de pantalla, accesib
 
 ## Privacidad
 
-KeenQuad no recopila nada y no tiene telemetría. Solo se conecta a internet cuando haces clic en **Buscar actualizaciones…**: una única solicitud a la API de GitHub para consultar la última versión, sin ninguna información sobre ti. Tus ajustes se guardan en `~/Library/Preferences/com.keenquad.app.plist`.
+KeenQuad no recopila nada y no tiene telemetría. Solo se conecta a internet cuando haces clic en **Buscar actualizaciones…**: una única solicitud a la API de GitHub para consultar la última versión, sin ninguna información sobre ti. Tus ajustes se guardan en `~/Library/Preferences/com.pivotfrag.keenquad.plist`.
 
 ## Desinstalar
 
 1. En el menú de KeenQuad, desactiva **Abrir al iniciar sesión** y elige **Salir de KeenQuad**.
 2. Elimina `/Applications/KeenQuad.app`.
-3. Opcional: ejecuta `defaults delete com.keenquad.app`.
+3. Opcional: ejecuta `defaults delete com.pivotfrag.keenquad`.
 
 La resolución que estés usando se mantiene; cámbiala en Ajustes del Sistema si quieres.
 
@@ -111,4 +111,4 @@ cd KeenQuad/tray
 
 Este proyecto está bajo la licencia **GPL-3.0-only** (consulta [LICENSE](../LICENSE)). El nombre KeenQuad y sus iconos no están cubiertos por la licencia; consulta [TRADEMARK.md](../TRADEMARK.md).
 
-Copyright © 2026 [33to9](https://github.com/33to9)
+Copyright © 2026 [Pivotfrag LLC](https://pivotfrag.com)

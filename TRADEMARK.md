@@ -9,7 +9,7 @@ All rights are reserved for:
 - the name **KeenQuad**;
 - the app icon, the menu-bar icon and the logos, including `tray/Resources/KeenQuad.icns`, `tray/Resources/MenuIconTemplate.png`, `tray/Resources/MenuIconTemplate@2x.png` and `img/keenquad-header.png`.
 
-Copyright © 2026 [33to9](https://github.com/33to9).
+Copyright © 2026 [Pivotfrag LLC](https://pivotfrag.com).
 
 ## What you can do
 

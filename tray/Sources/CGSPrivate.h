@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-only
-// Copyright © 2026 33to9
+// Copyright © 2026 Pivotfrag LLC
 // Private CoreGraphics declarations. All private API use is kept in this header and PrivateDisplay.swift.
 // The struct must be exactly 212 bytes.
 #include <CoreGraphics/CoreGraphics.h>

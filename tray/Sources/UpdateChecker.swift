@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-only
-// Copyright © 2026 33to9
+// Copyright © 2026 Pivotfrag LLC
 import Foundation
 
 /// Update-check logic without networking or UI, so it can be tested on its own.

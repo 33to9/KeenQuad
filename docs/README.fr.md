@@ -78,13 +78,13 @@ Aucune. Changer de mode d’affichage ne nécessite ni l’enregistrement de l�
 
 ## Confidentialité
 
-KeenQuad ne collecte rien et n’envoie aucune statistique. Il ne se connecte à Internet que lorsque vous cliquez sur **Rechercher les mises à jour…** : une seule requête à l’API GitHub pour connaître la dernière version, sans aucune information vous concernant. Vos réglages restent dans `~/Library/Preferences/com.keenquad.app.plist`.
+KeenQuad ne collecte rien et n’envoie aucune statistique. Il ne se connecte à Internet que lorsque vous cliquez sur **Rechercher les mises à jour…** : une seule requête à l’API GitHub pour connaître la dernière version, sans aucune information vous concernant. Vos réglages restent dans `~/Library/Preferences/com.pivotfrag.keenquad.plist`.
 
 ## Désinstallation
 
 1. Dans le menu de KeenQuad, désactivez **Ouvrir à la connexion**, puis choisissez **Quitter KeenQuad**.
 2. Supprimez `/Applications/KeenQuad.app`.
-3. Facultatif : exécutez `defaults delete com.keenquad.app`.
+3. Facultatif : exécutez `defaults delete com.pivotfrag.keenquad`.
 
 La définition utilisée reste en place ; changez-la dans Réglages Système si vous le souhaitez.
 
@@ -111,4 +111,4 @@ cd KeenQuad/tray
 
 Ce projet est distribué sous licence **GPL-3.0-only** (voir [LICENSE](../LICENSE)). Le nom KeenQuad et ses icônes ne sont pas couverts par la licence ; voir [TRADEMARK.md](../TRADEMARK.md).
 
-Copyright © 2026 [33to9](https://github.com/33to9)
+Copyright © 2026 [Pivotfrag LLC](https://pivotfrag.com)

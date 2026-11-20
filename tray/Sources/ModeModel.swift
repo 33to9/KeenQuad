@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-only
-// Copyright © 2026 33to9
+// Copyright © 2026 Pivotfrag LLC
 import Foundation
 
 /// One entry of the display mode table. Pure data with no system calls, so it can be tested on its own.

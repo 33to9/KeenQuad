@@ -78,13 +78,13 @@ Keine. Zum Umschalten der Anzeigemodi braucht KeenQuad weder Bildschirmaufnahme 
 
 ## Datenschutz
 
-KeenQuad sammelt nichts und hat keine Telemetrie. Es verbindet sich nur mit dem Internet, wenn du auf **Nach Updates suchen …** klickst: eine Anfrage an die GitHub-API nach der neuesten Version, ohne Informationen über dich. Deine Einstellungen liegen in `~/Library/Preferences/com.keenquad.app.plist`.
+KeenQuad sammelt nichts und hat keine Telemetrie. Es verbindet sich nur mit dem Internet, wenn du auf **Nach Updates suchen …** klickst: eine Anfrage an die GitHub-API nach der neuesten Version, ohne Informationen über dich. Deine Einstellungen liegen in `~/Library/Preferences/com.pivotfrag.keenquad.plist`.
 
 ## Deinstallieren
 
 1. Schalte im Menü von KeenQuad **Beim Anmelden starten** aus und wähle dann **KeenQuad beenden**.
 2. Lösche `/Applications/KeenQuad.app`.
-3. Optional: Führe `defaults delete com.keenquad.app` aus.
+3. Optional: Führe `defaults delete com.pivotfrag.keenquad` aus.
 
 Die aktuelle Auflösung bleibt erhalten; du kannst sie in den Systemeinstellungen ändern.
 
@@ -111,4 +111,4 @@ cd KeenQuad/tray
 
 Dieses Projekt steht unter der **GPL-3.0-only** (siehe [LICENSE](../LICENSE)). Der Name KeenQuad und die Symbole fallen nicht unter die Lizenz; siehe [TRADEMARK.md](../TRADEMARK.md).
 
-Copyright © 2026 [33to9](https://github.com/33to9)
+Copyright © 2026 [Pivotfrag LLC](https://pivotfrag.com)

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-only
-// Copyright © 2026 33to9
+// Copyright © 2026 Pivotfrag LLC
 import AppKit
 import ServiceManagement
 import os
@@ -34,7 +34,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var unkeptTrial: [String: String] = [:]
     private var signalSources: [DispatchSourceSignal] = []
     let updateChecker = UpdateChecker()   // internal for the test build
-    private let log = Logger(subsystem: Bundle.main.bundleIdentifier ?? "com.keenquad.app", category: "switch")
+    private let log = Logger(subsystem: Bundle.main.bundleIdentifier ?? "com.pivotfrag.keenquad", category: "switch")
 
     // MARK: - Lifecycle
 
@@ -101,7 +101,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         menu.addItem(login)
         menu.addItem(languageItem())   // F13.1
 
-        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0.4.0"
+        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? UpdateChecker.bundleVersion
         menu.addItem(disabledItem(L10n.version(version)))
 
         // While checking, show "Checking for Updates…" disabled
